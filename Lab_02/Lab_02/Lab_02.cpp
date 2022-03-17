@@ -128,6 +128,7 @@ public:
     void ChangeShade(sf::Event& event, sf::RenderWindow& window)
     {
         int temp, ChangeShade;
+        sf::Color ColorToChange;
         if (HoldingMouseButton) temp = event.mouseMove.y;
         else temp = event.mouseButton.y;
 
@@ -140,8 +141,8 @@ public:
         for (int i = 0; i < HSL.getVertexCount(); i++)
         {
             ChangeShade = (int)((280 - temp) * 100 / 270.);
-            HSL[i].color
-            HSL[i].color = HSLtoRGB();
+            HSL[i].color.b = temp;
+            HSL[i].color = HSLtoRGB(HSL[i].color.r, HSL[i].color.g, HSL[i].color.b); //cos nie dziala
         }
 
         
