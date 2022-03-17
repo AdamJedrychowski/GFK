@@ -137,6 +137,15 @@ public:
         PointerColor[1].operator[](0).position.y = (float)temp;
         PointerColor[1].operator[](1).position.y = (float)temp;
 
+        for (int i = 0; i < HSL.getVertexCount(); i++)
+        {
+            ChangeShade = (int)((280 - temp) * 100 / 270.);
+            HSL[i].color
+            HSL[i].color = HSLtoRGB();
+        }
+
+        
+        
         if (!HoldingMouseButton)
         {
             ActualWindow.clear(sf::Color::White);
@@ -163,9 +172,6 @@ public:
             ActualWindow.draw(PointerColor[0]);
             ActualWindow.display();
         }
-
-        ChangeShade = (int)((280 - temp) * 255 / 270.);
-        //cos dopisac
     }
 };
 
