@@ -4,30 +4,55 @@
 #define M_PI 3.14159265358979323846
 const int XWindowSize = 750, YWindowSize = 600;
 
+sf::Color RGBtoHSL(float r, float g, float b)
+{
+    r = r / 255,
+    g = g / 255,
+    b = b / 255;
+    float max = std::max({ r, g, b });
+    float min = std::min({ r, g, b });
+    float lum = (max + min) / 2;
+    float hue;
+    float sat;
+    if (max == min)
+    {
+        hue = 0;
+        sat = 0;
+    }
+    // calculating saturation
+    if (lum <= 0.5) sat = (max - min) / (max + min);
+    else sat = (max - min) / (2 - max - min);
+
+    //calculating hue
+    if (max == r) hue = (g - b) / (max - min);
+    else if (max == g) hue = 2 + (b - r) / (max - min);
+    else hue = 4 + (r - g) / (max - min);
+
+    hue = abs(hue);
+    hue *= 60;
+
+    return sf::Color(hue, sat, lum);
+}
+
 sf::Color HSVtoRGB(float H, float S, float V)
 {
     S = S / 100;
     V = V / 100;
-    double hh, p, q, t, ff, r, g, b;
-    int i;
+    double angle, p, q, t, ff, r, g, b;
 
     if (S <= 0.0)
     {
-        r = V;
-        g = V;
-        b = V;
-        return sf::Color(r, g, b);
+        return sf::Color(V, V, V);
     }
 
-    hh = H;
-    if (hh >= 360.0) hh = 0.0;
-    hh /= 60.0;
-    i = (int)hh;
-    ff = hh - i;
+    angle = H;
+    if (angle >= 360.0) angle = 0.0;
+    angle /= 60.0;
+    int i = (int)angle;
+    ff = angle - i;
     p = V * (1.0 - S);
     q = V * (1.0 - (S * ff));
     t = V * (1.0 - (S * (1.0 - ff)));
-
     switch (i) {
     case 0:
         r = V;
@@ -78,7 +103,6 @@ double HueToRGB(double arg1, double arg2, double H)
 sf::Color HSLtoRGB(double Hue, double Saturation, double Luminance)
 {
     const double D_EPSILON = 0.00000000000001;
-    ///Reconvert to range [0,1]
     double H = Hue / 360.0;
     double S = Saturation / 100.0;
     double L = Luminance / 100.0;
@@ -87,8 +111,7 @@ sf::Color HSLtoRGB(double Hue, double Saturation, double Luminance)
 
     if (S <= D_EPSILON)
     {
-        sf::Color C((int)(L * 255), (int)(L * 255), (int)(L * 255));
-        return C;
+        return sf::Color((int)(L * 255), (int)(L * 255), (int)(L * 255));
     }
     else
     {
@@ -99,8 +122,7 @@ sf::Color HSLtoRGB(double Hue, double Saturation, double Luminance)
         sf::Uint8 r = (int)(255 * HueToRGB(arg1, arg2, (H + 1.0 / 3.0)));
         sf::Uint8 g = (int)(255 * HueToRGB(arg1, arg2, H));
         sf::Uint8 b = (int)(255 * HueToRGB(arg1, arg2, (H - 1.0 / 3.0)));
-        sf::Color C(r, g, b);
-        return C;
+        return sf::Color(r, g, b);
     }
 }
 
@@ -127,7 +149,7 @@ public:
 
     void ChangeShade(sf::Event& event, sf::RenderWindow& window)
     {
-        int temp, ChangeShade;
+        unsigned char temp, ChangeShade;
         sf::Color ColorToChange;
         if (HoldingMouseButton) temp = event.mouseMove.y;
         else temp = event.mouseButton.y;
@@ -141,8 +163,8 @@ public:
         for (int i = 0; i < HSL.getVertexCount(); i++)
         {
             ChangeShade = (int)((280 - temp) * 100 / 270.);
-            HSL[i].color.b = temp;
-            HSL[i].color = HSLtoRGB(HSL[i].color.r, HSL[i].color.g, HSL[i].color.b); //cos nie dziala
+            ColorToChange = RGBtoHSL(HSL[i].color.r, HSL[i].color.g, HSL[i].color.b); //cos nie dziala
+            HSL[i].color = HSLtoRGB(ColorToChange.r, ColorToChange.g, ChangeShade);
         }
 
         
