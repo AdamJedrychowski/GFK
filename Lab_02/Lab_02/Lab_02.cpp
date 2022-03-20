@@ -1,10 +1,18 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <cmath>
+#include "font.h"
 #define M_PI 3.14159265358979323846
 const int XWindowSize = 750, YWindowSize = 600;
 
-sf::Color RGBtoHSL(float r, float g, float b)
+struct hsl
+{
+    float h, s, l;
+    hsl() {}
+    hsl(float _h, float _s, float _l) : h{_h}, s{_s}, l{_l} {}
+};
+
+hsl RGBtoHSL(float r, float g, float b)
 {
     r = r / 255,
     g = g / 255,
@@ -19,19 +27,23 @@ sf::Color RGBtoHSL(float r, float g, float b)
         hue = 0;
         sat = 0;
     }
-    // calculating saturation
-    if (lum <= 0.5) sat = (max - min) / (max + min);
-    else sat = (max - min) / (2 - max - min);
+    else
+    {
+        sat = (lum <= 0.5) ? (max - min) / (max + min) : (max - min) / (2 - max - min);
+        float h;
+        if (r == max) h = ((g - b) / 6) / (max - min);
+        else if (g == max) h = (1 / 3.) + ((b - r) / 6) / (max - min);
+        else h = (2 / 3.) + ((r - g) / 6) / (max - min);
 
-    //calculating hue
-    if (max == r) hue = (g - b) / (max - min);
-    else if (max == g) hue = 2 + (b - r) / (max - min);
-    else hue = 4 + (r - g) / (max - min);
+        if (h < 0) h += 1;
+        if (h > 0) h -= 1;
 
-    hue = abs(hue);
-    hue *= 60;
+        hue = (int)(h * 360);
+    }
+    sat = (int)(sat * 100);
+    lum = (int)(lum * 100);
 
-    return sf::Color(hue, sat, lum);
+    return hsl(hue, sat, lum);
 }
 
 sf::Color HSVtoRGB(float H, float S, float V)
@@ -131,11 +143,18 @@ sf::Color HSLtoRGB(double Hue, double Saturation, double Luminance)
 class BufferWindow : public sf::Drawable
 {
 private:
+    sf::Font font;
     sf::VertexArray ColorBar;
     sf::VertexArray HSL, _HSV, CMY, RGB;
     sf::RenderTexture ActualWindow;
     sf::Color ShadeOfCircles;
+
+    sf::Text TextHSL[2];
+    sf::Text TextHSV[2];
+    sf::Text TextCMY[2];
+    sf::Text TextRGB[2];
 public:
+    sf::Text FPScounter[2];
     sf::VertexArray PointerColor[2];
     bool HoldingMouseButton = false;
     BufferWindow();
@@ -149,9 +168,12 @@ public:
 
     void ChangeShade(sf::Event& event, sf::RenderWindow& window)
     {
-        unsigned char temp, ChangeShade;
-        sf::Color ColorToChange;
-        if (HoldingMouseButton) temp = event.mouseMove.y;
+        int temp, ChangeShade;
+        hsl ColorToChange;
+        if (HoldingMouseButton)
+        {
+            temp = event.mouseMove.y;
+        }
         else temp = event.mouseButton.y;
 
         //Changing position of Pointer bar
@@ -160,41 +182,59 @@ public:
         PointerColor[1].operator[](0).position.y = (float)temp;
         PointerColor[1].operator[](1).position.y = (float)temp;
 
-        for (int i = 0; i < HSL.getVertexCount(); i++)
+        ChangeShade = (int)((280 - temp) * 100 / 270.);
+        for (int i = 0; i < 362; i++)
         {
-            ChangeShade = (int)((280 - temp) * 100 / 270.);
-            ColorToChange = RGBtoHSL(HSL[i].color.r, HSL[i].color.g, HSL[i].color.b); //cos nie dziala
-            HSL[i].color = HSLtoRGB(ColorToChange.r, ColorToChange.g, ChangeShade);
+            ColorToChange = RGBtoHSL(HSL[i].color.r, HSL[i].color.g, HSL[i].color.b);
+            HSL[i].color = HSLtoRGB(ColorToChange.h, ColorToChange.s, ColorToChange.l);
+
+            
+        }
+        for (int i = 0; i < 724; i++)
+        {
+            RGB[i].color.b = 255 - (int)((280 - temp) * 255 / 270.);
+            CMY[i].color.b = (int)((280 - temp) * 255 / 270.);
         }
 
-        
-        
-        if (!HoldingMouseButton)
+        if (ChangeShade == 100)
         {
-            ActualWindow.clear(sf::Color::White);
-
-            ActualWindow.draw(PointerColor[0]);
-            ActualWindow.draw(PointerColor[1]);
-            ActualWindow.draw(HSL);
-            ActualWindow.draw(_HSV);
-            ActualWindow.draw(CMY);
-            ActualWindow.draw(RGB);
-            ActualWindow.draw(ColorBar);
-            ActualWindow.display();
+            TextHSL[1].setString((std::string)"L=1.00");
+            TextHSV[1].setString((std::string)"V=1.00");
+            TextCMY[1].setString((std::string)"Y=100%");
+        }
+        else if (ChangeShade < 10)
+        {
+            TextHSL[1].setString((std::string)"L=0.0" + std::to_string((int)ChangeShade));
+            TextHSV[1].setString((std::string)"V=0.0" + std::to_string((int)ChangeShade));
+            TextCMY[1].setString((std::string)"Y=" + std::to_string((int)ChangeShade) + "%");
         }
         else
         {
-            ActualWindow.clear(sf::Color::White);
-
-            ActualWindow.draw(HSL);
-            ActualWindow.draw(_HSV);
-            ActualWindow.draw(CMY);
-            ActualWindow.draw(RGB);
-            ActualWindow.draw(ColorBar);
-            ActualWindow.draw(PointerColor[1]);
-            ActualWindow.draw(PointerColor[0]);
-            ActualWindow.display();
+            TextHSL[1].setString((std::string)"L=0." + std::to_string((int)ChangeShade));
+            TextHSV[1].setString((std::string)"V=0." + std::to_string((int)ChangeShade));
+            TextCMY[1].setString((std::string)"Y=" + std::to_string((int)ChangeShade) + "%");
         }
+        TextRGB[1].setString((std::string)"B=" + std::to_string((int)((280 - temp) * 255 / 270.)));
+
+        ActualWindow.clear(sf::Color::White);
+
+        ActualWindow.draw(FPScounter[0]);
+        ActualWindow.draw(TextHSL[0]);
+        ActualWindow.draw(TextHSV[0]);
+        ActualWindow.draw(TextCMY[0]);
+        ActualWindow.draw(TextRGB[0]);
+        ActualWindow.draw(TextHSL[1]);
+        ActualWindow.draw(TextHSV[1]);
+        ActualWindow.draw(TextCMY[1]);
+        ActualWindow.draw(TextRGB[1]);
+        ActualWindow.draw(HSL);
+        ActualWindow.draw(_HSV);
+        ActualWindow.draw(CMY);
+        ActualWindow.draw(RGB);
+        ActualWindow.draw(ColorBar);
+        ActualWindow.draw(PointerColor[1]);
+        ActualWindow.draw(PointerColor[0]);
+        ActualWindow.display();
     }
 };
 
@@ -219,7 +259,7 @@ int main()
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed) window.close();
-            if (event.mouseButton.x > 610 && event.mouseButton.x < 650 && event.mouseButton.y>10 && event.mouseButton.y < 280)
+            if (event.mouseButton.x > 610 && event.mouseButton.x < 650 && event.mouseButton.y>=10 && event.mouseButton.y <= 280)
             {
                 if (!render.HoldingMouseButton && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
                 {
@@ -232,19 +272,16 @@ int main()
                     render.ChangeShade(event, window);
                 }
             }
-            else if (render.HoldingMouseButton && event.mouseMove.x > 610 && event.mouseMove.x < 650 && event.mouseMove.y>10 && event.mouseMove.y < 280)
+            else if (render.HoldingMouseButton && event.mouseMove.x > 610 && event.mouseMove.x < 650 && event.mouseMove.y>=10 && event.mouseMove.y <= 280)
             {
                 render.ChangeShade(event, window);
             }
 
         }
         //tu wyrysowaæ wszystko na ekran
-
-
-
-
         render.getActualWindow().display();
         window.draw(render);
+
 
         //tu wypisaæ na ekran wartoœæ FPS
         if (clock.getElapsedTime().asSeconds() >= 1.0f)
@@ -252,17 +289,23 @@ int main()
             FPS = (unsigned int)((float)frame_counter / clock.getElapsedTime().asSeconds());
             clock.restart();
             frame_counter = 0;
+            render.FPScounter[1].setString(std::to_string(FPS) + " FPS");
         }
         frame_counter++;
+        window.draw(render.FPScounter[1]);
         window.display();
     }
 }
 
 
 
-BufferWindow::BufferWindow() : ColorBar{ sf::Quads, 4 }, HSL{ sf::TriangleFan, 362 }, _HSV{ sf::TriangleFan, 362 },
-CMY{ sf::TriangleFan, 362 }, RGB{ sf::TriangleFan, 362 }
+BufferWindow::BufferWindow() : ColorBar{sf::Quads, 4}, HSL{sf::TriangleFan, 362}, _HSV{sf::TriangleFan, 362},
+CMY{ sf::TriangleStrip, 724 }, RGB{ sf::TriangleStrip, 724 }, FPScounter{ {"frame per seconds :", font}, {"0 FPS", font}},
+TextHSL{{"HSL", font},{"L=", font}}, TextHSV{{"HSV", font}, {"V=", font}}, TextCMY{{"CMY", font}, {"Y=", font}},
+TextRGB{{"RGB", font}, {"B=", font}}
 {
+    font.loadFromMemory(font_data, font_data_size);
+    
     ActualWindow.create(XWindowSize, YWindowSize);
     ColorBar[0].position = sf::Vector2f(610, 10);
     ColorBar[0].color = sf::Color::Black;
@@ -283,35 +326,53 @@ CMY{ sf::TriangleFan, 362 }, RGB{ sf::TriangleFan, 362 }
     _HSV[0].position = sf::Vector2f(440, 150);
     _HSV[0].color=sf::Color(128, 128, 128);
 
+
     CMY[0].position = sf::Vector2f(150, 440);
     CMY[0].color = sf::Color(255, 255, 128);
+    CMY[1].position = sf::Vector2f(270, 440);
+    CMY[1].color = sf::Color(0, 255, 128);
+    CMY[2].position = sf::Vector2f(270, 437.9057);
+    CMY[2].color = sf::Color(0, 254, 128);
 
     RGB[0].position = sf::Vector2f(440, 440);
     RGB[0].color = sf::Color(0, 0, 128);
+    RGB[1].position = sf::Vector2f(560, 440);
+    RGB[1].color = sf::Color(255, 0, 128);
+    RGB[2].position = sf::Vector2f(560, 437.9057);
+    RGB[2].color = sf::Color(255, 1, 128);
 
     for (int i = 1; i < 362; i++)
     {
         HSL[i].position = sf::Vector2f(150 + 120 * (float)cos((i - 1) * M_PI / 180.), 150 - 120 * (float)sin((i - 1) * M_PI / 180.));
-        _HSV[i].position = sf::Vector2f(440 + 120 * (float)cos((i - 1) * M_PI / 180.), 150 - 120 * (float)sin((i - 1) * M_PI / 180.));
-        CMY[i].position = sf::Vector2f(150 + 120 * (float)cos((i - 1) * M_PI / 180.), 440 - 120 * (float)sin((i - 1) * M_PI / 180.));
-        RGB[i].position = sf::Vector2f(440 + 120 * (float)cos((i - 1) * M_PI / 180.), 440 - 120 * (float)sin((i - 1) * M_PI / 180.));
         HSL[i].color = HSLtoRGB(i - 1, 100, 50);
+        _HSV[i].position = sf::Vector2f(440 + 120 * (float)cos((i - 1) * M_PI / 180.), 150 - 120 * (float)sin((i - 1) * M_PI / 180.));
         _HSV[i].color = HSVtoRGB(i - 1, 100, 50);
-        CMY[i].color = sf::Color(0, 255 - (i - 1) * 255 / 362., 128);
-        RGB[i].color = sf::Color(255, (i - 1)*255/362., 128);
+    }
+
+    for (int i = 3; i < 724; i++)
+    {
+        if (i % 2 == 1)
+        {
+            CMY[i].position = sf::Vector2f(150, 440);
+            CMY[i].color = sf::Color(255, 255 - i / 2. * 255 / 362., 128);
+
+            RGB[i].position = sf::Vector2f(440, 440);
+            RGB[i].color = sf::Color(0, i / 2. * 255 / 362., 128);
+        }
+        else
+        {
+            CMY[i].position = sf::Vector2f(150 + 120 * (float)cos((i/2 - 1) * M_PI / 180.), 440 - 120 * (float)sin((i/2 - 1) * M_PI / 180.));
+            CMY[i].color = sf::Color(0, 255 - i / 2. * 255 / 362., 128);
+
+            RGB[i].position = sf::Vector2f(440 + 120 * (float)cos((i/2 - 1) * M_PI / 180.), 440 - 120 * (float)sin((i/2 - 1) * M_PI / 180.));
+            RGB[i].color = sf::Color(255, i / 2. * 255 / 362., 128);
+        }
     }
     HSL[361].position = sf::Vector2f(270, 150);
     HSL[361].color = sf::Color(255, 0, 0);
 
     _HSV[361].position = sf::Vector2f(560, 150);
     _HSV[361].color = sf::Color(128, 0, 2);
-
-    CMY[361].position = sf::Vector2f(270, 440);
-    CMY[361].color = sf::Color(0, 0, 128);
-
-    RGB[361].position = sf::Vector2f(560, 440);
-    RGB[361].color = sf::Color(255, 255, 128);
-
 
 
 
@@ -332,7 +393,55 @@ CMY{ sf::TriangleFan, 362 }, RGB{ sf::TriangleFan, 362 }
     PointerColor[1].operator[](1).color = sf::Color::Black;
 
 
+    TextHSL[0].setPosition(30, 30);
+    TextHSL[0].setFillColor(sf::Color::Black);
+    TextHSL[0].setCharacterSize(16);
+    TextHSL[1].setPosition(230, 250);
+    TextHSL[1].setFillColor(sf::Color::Black);
+    TextHSL[1].setCharacterSize(16);
+    TextHSL[1].setString((std::string)"L=0.50");
 
+
+    TextHSV[0].setPosition(320, 30);
+    TextHSV[0].setFillColor(sf::Color::Black);
+    TextHSV[0].setCharacterSize(16);
+    TextHSV[1].setPosition(520, 250);
+    TextHSV[1].setFillColor(sf::Color::Black);
+    TextHSV[1].setCharacterSize(16);
+    TextHSV[1].setString((std::string)"V=0.50");
+
+    TextCMY[0].setPosition(30, 320);
+    TextCMY[0].setFillColor(sf::Color::Black);
+    TextCMY[0].setCharacterSize(16);
+    TextCMY[1].setPosition(230, 540);
+    TextCMY[1].setFillColor(sf::Color::Black);
+    TextCMY[1].setCharacterSize(16);
+    TextCMY[1].setString((std::string)"Y=50%");
+
+    TextRGB[0].setPosition(320, 320);
+    TextRGB[0].setFillColor(sf::Color::Black);
+    TextRGB[0].setCharacterSize(16);
+    TextRGB[1].setPosition(520, 540);
+    TextRGB[1].setFillColor(sf::Color::Black);
+    TextRGB[1].setCharacterSize(16);
+    TextRGB[1].setString((std::string)"B=128");
+
+    FPScounter[0].setPosition(580, 290);
+    FPScounter[0].setFillColor(sf::Color::Black);
+    FPScounter[0].setCharacterSize(16);
+    FPScounter[1].setPosition(610, 310);
+    FPScounter[1].setFillColor(sf::Color::Black);
+    FPScounter[1].setCharacterSize(16);
+
+    ActualWindow.draw(FPScounter[0]);
+    ActualWindow.draw(TextHSL[0]);
+    ActualWindow.draw(TextHSV[0]);
+    ActualWindow.draw(TextCMY[0]);
+    ActualWindow.draw(TextRGB[0]);
+    ActualWindow.draw(TextHSL[1]);
+    ActualWindow.draw(TextHSV[1]);
+    ActualWindow.draw(TextCMY[1]);
+    ActualWindow.draw(TextRGB[1]);
     ActualWindow.draw(PointerColor[0]);
     ActualWindow.draw(PointerColor[1]);
     ActualWindow.draw(HSL);
