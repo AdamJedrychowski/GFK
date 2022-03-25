@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{535ebbbe-aef8-4701-9fe5-8dd3fd0d5aa9}</ProjectGuid>
-    <RootNamespace>Lab03</RootNamespace>
+    <ProjectGuid>{9035f6dd-6022-4b3a-98dd-2e5c71bd3b77}</ProjectGuid>
+    <RootNamespace>check</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -145,13 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GUI.cpp" />
-    <ClCompile Include="GUIMyFrame1.cpp" />
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="GUI.h" />
-    <ClInclude Include="GUIMyFrame1.h" />
+    <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
