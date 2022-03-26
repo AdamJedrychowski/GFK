@@ -1,16 +1,23 @@
 #include "GUIMyFrame1.h"
 
-GUIMyFrame1::GUIMyFrame1( wxWindow* parent )
-:
-MyFrame1( parent )
+GUIMyFrame1::GUIMyFrame1(wxWindow* parent)
+	:
+	MyFrame1(parent), RadiusOfBanan{ 0 }, StarColor{ 0,0,0 }
 {
 	Bind(wxEVT_PAINT, &GUIMyFrame1::m_panel3OnPaint, this);
+	Bind(wxEVT_CHECKBOX, &GUIMyFrame1::CheckBox_LoadBananOnCheckBox, this);
+
+	ScrollBar_MoveBanan->SetRange(45);
+	ScrollBar_MoveBanan->SetThumbSize(1);
+	Gauge_BananPosition->SetRange(45);
+
+	ConnectWithFile.AddHandler(new wxPNGHandler);
 }
 
 void GUIMyFrame1::m_panel3OnPaint( wxPaintEvent& event )
 {
 // TODO: Implement m_panel3OnPaint
-	std::unique_ptr<wxClientDC> MyDC(new wxClientDC(m_panel3));
+	std::shared_ptr<wxClientDC> MyDC(new wxClientDC(m_panel3));
 	MyDC->Clear();
 
 	int x = m_panel3->GetSize().x, y = m_panel3->GetSize().y;
@@ -18,15 +25,31 @@ void GUIMyFrame1::m_panel3OnPaint( wxPaintEvent& event )
 	//person
 	MyDC->DrawLine(x / 2, y / 2 - 10, x / 2, y / 2 + 60);
 	MyDC->DrawLine(x / 2, y / 2, x / 2 + 40, y / 2 + 20);
-	MyDC->DrawLine(x / 2, y / 2, x / 2 - 40, y / 2 + 20);
+	MyDC->DrawLine(x / 2, y / 2, x / 2 + 44.7214 * cos((154.56505118 + RadiusOfBanan) * PI / 180.),
+		y / 2 + 44.7214 * sin((154.56505118 + RadiusOfBanan) * PI / 180.));
 	MyDC->DrawLine(x / 2, y / 2 + 60, x / 2 + 30, y / 2 + 90);
 	MyDC->DrawLine(x / 2, y / 2 + 60, x / 2 - 30, y / 2 + 90);
+
+	//banan
+	if (Banan.IsOk())
+	{
+		MyDC->DrawBitmap(Banan, x / 2 + 44.7214 * cos((154.56505118 + RadiusOfBanan) * PI / 180.) - 20,
+			y / 2 + 44.7214 * sin((154.56505118 + RadiusOfBanan) * PI / 180.) - 20);
+	}
 
 	//head
 	MyDC->DrawCircle(x / 2, y / 2 - 30, 20);
 	MyDC->DrawEllipse(x / 2 - 12, y / 2 - 38, 9, 6);
-	MyDC->DrawEllipse(x / 2 + 4, y / 2 - 40, 6, 9);
-	MyDC->DrawEllipticArc(x / 2 - 15, y / 2 - 25, 30, 10, 0, 180);
+	if (!Banan.IsOk())
+	{
+		MyDC->DrawEllipse(x / 2 + 4, y / 2 - 40, 6, 9);
+		MyDC->DrawEllipticArc(x / 2 - 15, y / 2 - 25, 30, 10, 0, 180);
+	}
+	else
+	{
+		MyDC->DrawEllipse(x / 2 + 3, y / 2 - 38, 9, 6);
+		MyDC->DrawEllipticArc(x / 2 - 15, y / 2 - 30, 30, 10, 180, 360);
+	}
 
 	//text uzupe³nic o value
 	MyDC->DrawText("tekst", x / 2 - 100, y / 2 + 80);
@@ -36,7 +59,7 @@ void GUIMyFrame1::m_panel3OnPaint( wxPaintEvent& event )
 	//star
 	wxPoint CreateStar[5] = { wxPoint(x / 2 - 80, y / 2 - 100), wxPoint(x / 2 - 60, y / 2 - 50),
 		wxPoint(x / 2 - 110, y / 2 - 80), wxPoint(x / 2 - 50, y / 2 - 80), wxPoint(x / 2 - 100, y / 2 - 50) };
-	MyDC->SetBrush(wxBrush(wxColour(0, 0, 0), wxBRUSHSTYLE_SOLID));
+	MyDC->SetBrush(wxBrush(StarColor, wxBRUSHSTYLE_SOLID));
 	MyDC->DrawPolygon(5, CreateStar);
 }
 
@@ -47,12 +70,41 @@ void GUIMyFrame1::Button_SaveToFileOnButtonClick( wxCommandEvent& event )
 
 void GUIMyFrame1::CheckBox_LoadBananOnCheckBox( wxCommandEvent& event )
 {
-// TODO: Implement CheckBox_LoadBananOnCheckBox
+	// TODO: Implement CheckBox_LoadBananOnCheckBox
+	if (CheckBox_LoadBanan->IsChecked())
+	{
+		std::shared_ptr<wxFileDialog> LoadImage(new wxFileDialog(this));
+		LoadImage->SetPath(_("F:\\Visual Studio\\Visual Studio Community\\AdamJedrychowski\\GFK\\Lab_03\\banan.png"));
+
+		if (!ConnectWithFile.LoadFile(LoadImage->GetPath(), wxBITMAP_TYPE_PNG))
+			wxLogError(_("Nie mo¿na za³adowaæ obrazka"));
+		else
+		{
+			wxImage TempImg(ConnectWithFile);
+			TempImg.Rescale(40, 40);
+			ConnectWithFile.Paste(TempImg, ConnectWithFile.GetWidth() - 120, 0);
+			Banan = wxBitmap(ConnectWithFile);
+		}
+
+		ScrollBar_MoveBanan->Enable(true);
+		ScrollBar_MoveBanan->SetThumbPosition(RadiusOfBanan);
+	}
+	else
+	{
+		ScrollBar_MoveBanan->Enable(false);
+		Banan.UnRef();
+	}
+	SetSize(GetSize().x + 1, GetSize().y);
+	SetSize(GetSize().x - 1, GetSize().y);
 }
 
 void GUIMyFrame1::ScrollBar_MoveBananOnScroll( wxScrollEvent& event )
 {
 // TODO: Implement ScrollBar_MoveBananOnScroll
+	RadiusOfBanan = ScrollBar_MoveBanan->GetThumbPosition();
+	Gauge_BananPosition->SetValue(RadiusOfBanan);
+	SetSize(GetSize().x + 1, GetSize().y);
+	SetSize(GetSize().x - 1, GetSize().y);
 }
 
 void GUIMyFrame1::Button_StarColorOnButtonClick( wxCommandEvent& event )
