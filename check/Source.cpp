@@ -1,6 +1,4 @@
 #include <wx/wxprec.h>
-#include <wx/fontenum.h>
-#include <memory>
 
 class MyApp : public wxApp
 {
@@ -13,10 +11,14 @@ class MyFrame : public wxFrame
 public:
 	MyFrame();
 private:
-	wxStaticText* WxStaticText1;
-	wxChoice* WxChoice1;
+	wxButton* WxButton1;
+	wxButton* WxButton2;
+	wxBitmap MyBitmap;
+	wxImage  MyImage;
+
 	void Form_Paint(wxPaintEvent& e);
-	void WxChoice1_Selected(wxCommandEvent& e);
+	void WxButton1_Click(wxCommandEvent& e);
+	void WxButton2_Click(wxCommandEvent& e);
 };
 
 wxIMPLEMENT_APP(MyApp);
@@ -28,43 +30,54 @@ bool MyApp::OnInit()
 	return true;
 }
 
-MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "Demo 07")
+MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "Demo 08")
 {
-	SetTitle(_("Demo 07 - Czcionki i napisy"));
+	SetTitle(_("Demo 08 - Obs³uga BMP i JPG"));
 	SetIcon(wxNullIcon);
-	SetSize(8, 8, 729, 422);
+	SetSize(8, 8, 380, 596);
 	Center();
 
-	WxStaticText1 = new wxStaticText(this, wxID_ANY, _("ABCDEFGabcdefg1234"), wxPoint(46, 28), wxDefaultSize, 0, _("WxStaticText1"));
-	WxStaticText1->SetFont(wxFont(25, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, _("Tahoma")));
-
-	wxArrayString arrayStringFor_WxChoice1;
-	WxChoice1 = new wxChoice(this, wxID_ANY, wxPoint(447, 21), wxSize(234, 23), arrayStringFor_WxChoice1, 0, wxDefaultValidator, _("WxChoice1"));
-	wxArrayString SystemFonts;
-	SystemFonts = wxFontEnumerator::GetFacenames(); // ---> #include <wx/fontenum.h>
-	for (unsigned int i = 0; i < SystemFonts.Count(); i++) WxChoice1->Append(SystemFonts[i]);
-	WxChoice1->SetSelection(0);
+	WxButton1 = new wxButton(this, wxID_ANY, _("Wczytaj JPG"), wxPoint(23, 503), wxSize(121, 29), 0, wxDefaultValidator, _("WxButton1"));
+	WxButton2 = new wxButton(this, wxID_ANY, _("Zapisz Obrazki"), wxPoint(205, 503), wxSize(129, 29), 0, wxDefaultValidator, _("WxButton2"));
 
 	Bind(wxEVT_PAINT, &MyFrame::Form_Paint, this);
-	WxChoice1->Bind(wxEVT_CHOICE, &MyFrame::WxChoice1_Selected, this);
+	WxButton1->Bind(wxEVT_BUTTON, &MyFrame::WxButton1_Click, this);
+	WxButton2->Bind(wxEVT_BUTTON, &MyFrame::WxButton2_Click, this);
+
+	MyImage.AddHandler(new wxJPEGHandler);
+	MyImage.AddHandler(new wxPNGHandler);
 }
 
-void MyFrame::WxChoice1_Selected(wxCommandEvent& e)
+void MyFrame::WxButton1_Click(wxCommandEvent& e)
 {
-	WxStaticText1->SetFont(wxFont(22, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, WxChoice1->GetString(WxChoice1->GetSelection())));
-	Refresh();
+	std::shared_ptr<wxFileDialog> WxOpenFileDialog1(new wxFileDialog(this, _("Choose a file"), _(""), _(""), _("JPEG files (*.jpg)|*.jpg"), wxFD_OPEN));
+	if (WxOpenFileDialog1->ShowModal() == wxID_OK)
+	{
+		if (!MyImage.LoadFile(WxOpenFileDialog1->GetPath(), wxBITMAP_TYPE_JPEG))
+			wxLogError(_("Nie mo¿na za³adowaæ obrazka"));
+		else
+		{
+			wxImage TempImg(MyImage);
+			TempImg.Rescale(120, 80);
+			MyImage.Paste(TempImg, MyImage.GetWidth() - 120, 0);
+			MyBitmap = wxBitmap(MyImage);
+		}
+		if (MyBitmap.Ok()) this->SetTitle(WxOpenFileDialog1->GetPath());
+		Refresh();
+	}
 }
 
 void MyFrame::Form_Paint(wxPaintEvent& e)
 {
-	std::unique_ptr<wxPaintDC> MyDC(new wxPaintDC(this));
-	MyDC->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, WxChoice1->GetString(WxChoice1->GetSelection())));
-	MyDC->DrawText("Przyk³adowy tekst (ÊêÓó¥¹Œœ£³¯¿ŸæÑñ)", 20, 70);
-	MyDC->SetTextForeground(wxColor(255, 0, 0));
-	MyDC->DrawText("Kolorowy text", 20, 90);
-	MyDC->SetFont(wxFont(20, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, true, WxChoice1->GetString(WxChoice1->GetSelection())));
-	MyDC->DrawText("Przyk³adowy tekst pogrubiony", 20, 130);
-	MyDC->SetFont(wxFont(15, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_BOLD, false, WxChoice1->GetString(WxChoice1->GetSelection())));
-	MyDC->SetTextForeground(wxColor(0, 0, 255));
-	MyDC->DrawText("Przyk³adowy tekst pochy³y", 20, 170);
+	wxPaintDC dc(this);
+	PrepareDC(dc);
+	if (MyBitmap.Ok()) dc.DrawBitmap(MyBitmap, 20, 20);
+}
+
+void MyFrame::WxButton2_Click(wxCommandEvent& e)
+{
+	MyImage.SaveFile("test-out.bmp");
+	MyImage.SetOption("quality", 5);
+	MyImage.SaveFile("test-out.jpg");
+	MyImage.SaveFile("test-out.png");
 }
