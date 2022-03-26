@@ -78,13 +78,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\adamj\source\wxWidgets\include\msvc;C:\Users\adamj\source\wxWidgets\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\adamj\source\wxWidgets\lib\vc_x64_lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>F:\Visual Studio\Visual Studio Community\wxWidgets\include\msvc;F:\Visual Studio\Visual Studio Community\wxWidgets\include;C:\Users\adamj\source\wxWidgets\include\msvc;C:\Users\adamj\source\wxWidgets\include;$(IncludePath)</IncludePath>
+    <LibraryPath>F:\Visual Studio\Visual Studio Community\wxWidgets\lib\vc_x64_lib;C:\Users\adamj\source\wxWidgets\lib\vc_x64_lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\adamj\source\wxWidgets\include\msvc;C:\Users\adamj\source\wxWidgets\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\adamj\source\wxWidgets\lib\vc_x64_lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>F:\Visual Studio\Visual Studio Community\wxWidgets\include\msvc;F:\Visual Studio\Visual Studio Community\wxWidgets\include;C:\Users\adamj\source\wxWidgets\include\msvc;C:\Users\adamj\source\wxWidgets\include;$(IncludePath)</IncludePath>
+    <LibraryPath>F:\Visual Studio\Visual Studio Community\wxWidgets\lib\vc_x64_lib;C:\Users\adamj\source\wxWidgets\lib\vc_x64_lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

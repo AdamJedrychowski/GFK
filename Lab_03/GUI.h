@@ -29,6 +29,13 @@
 
 ///////////////////////////////////////////////////////////////////////////
 
+#define wxID_Panel 1000
+#define wxID_Save 1001
+#define wxID_Banan 1002
+#define wxID_Move 1003
+#define wxID_Position 1004
+#define wxID_Color 1005
+#define wxID_Write 1006
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class MyFrame1
@@ -38,7 +45,7 @@ class MyFrame1 : public wxFrame
 	private:
 
 	protected:
-		wxPanel* m_panel1;
+		wxPanel* m_panel3;
 		wxButton* Button_SaveToFile;
 		wxCheckBox* CheckBox_LoadBanan;
 		wxScrollBar* ScrollBar_MoveBanan;
@@ -48,7 +55,7 @@ class MyFrame1 : public wxFrame
 		wxChoice* Choice_Element;
 
 		// Virtual event handlers, override them in your derived class
-		virtual void m_panel1OnPaint( wxPaintEvent& event ) { event.Skip(); }
+		virtual void m_panel3OnPaint( wxPaintEvent& event ) { event.Skip(); }
 		virtual void Button_SaveToFileOnButtonClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void CheckBox_LoadBananOnCheckBox( wxCommandEvent& event ) { event.Skip(); }
 		virtual void ScrollBar_MoveBananOnScroll( wxScrollEvent& event ) { event.Skip(); }

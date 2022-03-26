@@ -16,39 +16,40 @@ MyFrame1::MyFrame1( wxWindow* parent, wxWindowID id, const wxString& title, cons
 	wxBoxSizer* bSizer1;
 	bSizer1 = new wxBoxSizer( wxHORIZONTAL );
 
-	wxBoxSizer* bSizer2;
-	bSizer2 = new wxBoxSizer( wxVERTICAL );
+	wxBoxSizer* bSizer4;
+	bSizer4 = new wxBoxSizer( wxVERTICAL );
 
-	m_panel1 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	m_panel1->SetBackgroundColour( wxColour( 255, 255, 255 ) );
+	m_panel3 = new wxPanel( this, wxID_Panel, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_panel3->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxEmptyString ) );
+	m_panel3->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_HIGHLIGHTTEXT ) );
 
-	bSizer2->Add( m_panel1, 1, wxEXPAND | wxALL, 5 );
+	bSizer4->Add( m_panel3, 1, wxEXPAND | wxALL, 5 );
 
 
-	bSizer1->Add( bSizer2, 1, wxEXPAND, 5 );
+	bSizer1->Add( bSizer4, 1, wxEXPAND, 5 );
 
 	wxBoxSizer* bSizer3;
 	bSizer3 = new wxBoxSizer( wxVERTICAL );
 
-	Button_SaveToFile = new wxButton( this, wxID_ANY, wxT("Zapis do pliku"), wxDefaultPosition, wxSize( 150,40 ), 0 );
+	Button_SaveToFile = new wxButton( this, wxID_Save, wxT("Zapis do pliku"), wxDefaultPosition, wxSize( 150,40 ), 0 );
 	bSizer3->Add( Button_SaveToFile, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
-	CheckBox_LoadBanan = new wxCheckBox( this, wxID_ANY, wxT("banan"), wxDefaultPosition, wxSize( 100,30 ), 0 );
+	CheckBox_LoadBanan = new wxCheckBox( this, wxID_Banan, wxT("banan"), wxDefaultPosition, wxSize( 100,30 ), 0 );
 	bSizer3->Add( CheckBox_LoadBanan, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
-	ScrollBar_MoveBanan = new wxScrollBar( this, wxID_ANY, wxDefaultPosition, wxSize( 190,30 ), wxSB_HORIZONTAL );
+	ScrollBar_MoveBanan = new wxScrollBar( this, wxID_Move, wxDefaultPosition, wxSize( 190,30 ), wxSB_HORIZONTAL );
 	ScrollBar_MoveBanan->Enable( false );
 
 	bSizer3->Add( ScrollBar_MoveBanan, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
-	Gauge_BananPosition = new wxGauge( this, wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL );
+	Gauge_BananPosition = new wxGauge( this, wxID_Position, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL );
 	Gauge_BananPosition->SetValue( 0 );
 	bSizer3->Add( Gauge_BananPosition, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
-	Button_StarColor = new wxButton( this, wxID_ANY, wxT("kolor gwiazdki"), wxDefaultPosition, wxSize( 150,40 ), 0 );
+	Button_StarColor = new wxButton( this, wxID_Color, wxT("kolor gwiazdki"), wxDefaultPosition, wxSize( 150,40 ), 0 );
 	bSizer3->Add( Button_StarColor, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
-	TextCtrl_Write = new wxTextCtrl( this, wxID_ANY, wxT("tekst"), wxDefaultPosition, wxDefaultSize, 0 );
+	TextCtrl_Write = new wxTextCtrl( this, wxID_Write, wxT("tekst"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer3->Add( TextCtrl_Write, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
 	wxString Choice_ElementChoices[] = { wxT("gwiazdka"), wxT("księżyc"), wxT("słonko") };
@@ -67,7 +68,7 @@ MyFrame1::MyFrame1( wxWindow* parent, wxWindowID id, const wxString& title, cons
 	this->Centre( wxBOTH );
 
 	// Connect Events
-	m_panel1->Connect( wxEVT_PAINT, wxPaintEventHandler( MyFrame1::m_panel1OnPaint ), NULL, this );
+	m_panel3->Connect( wxEVT_PAINT, wxPaintEventHandler( MyFrame1::m_panel3OnPaint ), NULL, this );
 	Button_SaveToFile->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MyFrame1::Button_SaveToFileOnButtonClick ), NULL, this );
 	CheckBox_LoadBanan->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( MyFrame1::CheckBox_LoadBananOnCheckBox ), NULL, this );
 	ScrollBar_MoveBanan->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( MyFrame1::ScrollBar_MoveBananOnScroll ), NULL, this );
@@ -87,7 +88,7 @@ MyFrame1::MyFrame1( wxWindow* parent, wxWindowID id, const wxString& title, cons
 MyFrame1::~MyFrame1()
 {
 	// Disconnect Events
-	m_panel1->Disconnect( wxEVT_PAINT, wxPaintEventHandler( MyFrame1::m_panel1OnPaint ), NULL, this );
+	m_panel3->Disconnect( wxEVT_PAINT, wxPaintEventHandler( MyFrame1::m_panel3OnPaint ), NULL, this );
 	Button_SaveToFile->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MyFrame1::Button_SaveToFileOnButtonClick ), NULL, this );
 	CheckBox_LoadBanan->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( MyFrame1::CheckBox_LoadBananOnCheckBox ), NULL, this );
 	ScrollBar_MoveBanan->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( MyFrame1::ScrollBar_MoveBananOnScroll ), NULL, this );
