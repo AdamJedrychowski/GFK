@@ -19,6 +19,7 @@ class GUIMyFrame1 : public MyFrame1
 {
 	protected:
 		// Handlers for MyFrame1 events.
+		void UpdateScreen( wxMoveEvent& event );
 		void m_panel3OnPaint( wxPaintEvent& event );
 		void Button_SaveToFileOnButtonClick( wxCommandEvent& event );
 		void CheckBox_LoadBananOnCheckBox( wxCommandEvent& event );
@@ -30,7 +31,7 @@ class GUIMyFrame1 : public MyFrame1
 		/** Constructor */
 		GUIMyFrame1( wxWindow* parent );
 	//// end generated class members
-		
+
 	private:
 		double RadiusOfBanan;
 		wxBitmap Banan;
@@ -43,6 +44,8 @@ class GUIMyFrame1 : public MyFrame1
 		/*void DrawHand();
 		void DrawElement(); Maybe?
 		void DrawText();*/
+
+
 
 };
 

@@ -1,5 +1,15 @@
 #include "GUIMyFrame1.h"
 
+
+void GUIMyFrame1::UpdateScreen( wxMoveEvent& event )
+{
+// TODO: Implement UpdateScreen
+
+}
+
+
+#include "GUIMyFrame1.h"
+
 GUIMyFrame1::GUIMyFrame1(wxWindow* parent)
 	:
 	MyFrame1(parent), RadiusOfBanan{ 0 }, StarColor{ 0,0,0 }, TextToWrite{ "tekst" }
@@ -15,9 +25,9 @@ GUIMyFrame1::GUIMyFrame1(wxWindow* parent)
 	ConnectWithFile.AddHandler(new wxJPEGHandler);
 }
 
-void GUIMyFrame1::m_panel3OnPaint( wxPaintEvent& event )
+void GUIMyFrame1::m_panel3OnPaint(wxPaintEvent& event)
 {
-// TODO: Implement m_panel3OnPaint
+	// TODO: Implement m_panel3OnPaint
 	std::shared_ptr<wxClientDC> MyDC(new wxClientDC(m_panel3));
 	MyDC->Clear();
 
@@ -52,13 +62,13 @@ void GUIMyFrame1::m_panel3OnPaint( wxPaintEvent& event )
 		MyDC->DrawEllipticArc(x / 2 - 15, y / 2 - 30, 30, 10, 180, 360);
 	}
 
-	//text uzupe³nic o value
+	//text uzupeÅ‚nic o value
 	MyDC->DrawText(TextToWrite, x / 2 - 100, y / 2 + 80);
 	MyDC->SetFont(wxFont(wxFontInfo(30).Family(wxFONTFAMILY_SCRIPT).Bold().Slant()));
 	MyDC->DrawRotatedText(TextToWrite, x / 2 + 70, y / 2 + 90, 90);
 
 	//star
-	if (Choice_Element->GetSelection()==0)
+	if (Choice_Element->GetSelection() == 0)
 	{
 		wxPoint CreateStar[5] = { wxPoint(x / 2 - 80, y / 2 - 100), wxPoint(x / 2 - 60, y / 2 - 50),
 			wxPoint(x / 2 - 110, y / 2 - 80), wxPoint(x / 2 - 50, y / 2 - 80), wxPoint(x / 2 - 100, y / 2 - 50) };
@@ -66,7 +76,7 @@ void GUIMyFrame1::m_panel3OnPaint( wxPaintEvent& event )
 		MyDC->SetPen(wxPen(StarColor));
 		MyDC->DrawPolygon(5, CreateStar);
 	}
-	else if (Choice_Element->GetSelection()==1)
+	else if (Choice_Element->GetSelection() == 1)
 	{
 		MyDC->SetBrush(wxColour(200, 200, 200));
 		MyDC->SetPen(wxPen(wxColour(200, 200, 200)));
@@ -88,15 +98,15 @@ void GUIMyFrame1::m_panel3OnPaint( wxPaintEvent& event )
 	}
 }
 
-void GUIMyFrame1::Button_SaveToFileOnButtonClick( wxCommandEvent& event )
+void GUIMyFrame1::Button_SaveToFileOnButtonClick(wxCommandEvent& event)
 {
-// TODO: Implement Button_SaveToFileOnButtonClick
+	// TODO: Implement Button_SaveToFileOnButtonClick
 	std::shared_ptr<wxFileDialog> SaveToFile(new wxFileDialog(this, _("Choose a file"), _(""), _(""), _(""), wxFD_SAVE));
 
 	if (SaveToFile->ShowModal() == wxID_OK)
 	{
 		wxWindowDC PanelScreen(this);
-		wxCoord screenWidth= m_panel3->GetPosition().x, screenHeight= m_panel3->GetPosition().y;
+		wxCoord screenWidth = m_panel3->GetPosition().x, screenHeight = m_panel3->GetPosition().y;
 
 		wxBitmap screenshot(m_panel3->GetSize().x, m_panel3->GetSize().y, -1);
 		wxMemoryDC memDC;
@@ -114,7 +124,7 @@ void GUIMyFrame1::Button_SaveToFileOnButtonClick( wxCommandEvent& event )
 	}
 }
 
-void GUIMyFrame1::CheckBox_LoadBananOnCheckBox( wxCommandEvent& event )
+void GUIMyFrame1::CheckBox_LoadBananOnCheckBox(wxCommandEvent& event)
 {
 	// TODO: Implement CheckBox_LoadBananOnCheckBox
 	if (CheckBox_LoadBanan->IsChecked())
@@ -123,7 +133,7 @@ void GUIMyFrame1::CheckBox_LoadBananOnCheckBox( wxCommandEvent& event )
 		LoadImage->SetPath(_("F:\\Visual Studio\\Visual Studio Community\\AdamJedrychowski\\GFK\\Lab_03\\banan.png"));
 
 		if (!ConnectWithFile.LoadFile(LoadImage->GetPath(), wxBITMAP_TYPE_PNG))
-			wxLogError(_("Nie mo¿na za³adowaæ obrazka"));
+			wxLogError(_("Nie moÅ¼na zaÅ‚adowaÄ‡ obrazka"));
 		else
 		{
 			wxImage TempImg(ConnectWithFile);
@@ -144,19 +154,19 @@ void GUIMyFrame1::CheckBox_LoadBananOnCheckBox( wxCommandEvent& event )
 	SetSize(GetSize().x - 1, GetSize().y);
 }
 
-void GUIMyFrame1::ScrollBar_MoveBananOnScroll( wxScrollEvent& event )
+void GUIMyFrame1::ScrollBar_MoveBananOnScroll(wxScrollEvent& event)
 {
-// TODO: Implement ScrollBar_MoveBananOnScroll
+	// TODO: Implement ScrollBar_MoveBananOnScroll
 	RadiusOfBanan = ScrollBar_MoveBanan->GetThumbPosition();
 	Gauge_BananPosition->SetValue(RadiusOfBanan);
 	SetSize(GetSize().x + 1, GetSize().y);
 	SetSize(GetSize().x - 1, GetSize().y);
 }
 
-void GUIMyFrame1::Button_StarColorOnButtonClick( wxCommandEvent& event )
+void GUIMyFrame1::Button_StarColorOnButtonClick(wxCommandEvent& event)
 {
-// TODO: Implement Button_StarColorOnButtonClick
-	
+	// TODO: Implement Button_StarColorOnButtonClick
+
 	std::unique_ptr<wxColourDialog> ChooseColor(new wxColourDialog(this));
 	if (ChooseColor->ShowModal() == wxID_OK)
 	{
@@ -166,17 +176,17 @@ void GUIMyFrame1::Button_StarColorOnButtonClick( wxCommandEvent& event )
 	SetSize(GetSize().x - 1, GetSize().y);
 }
 
-void GUIMyFrame1::TextCtrl_WriteOnText( wxCommandEvent& event )
+void GUIMyFrame1::TextCtrl_WriteOnText(wxCommandEvent& event)
 {
-// TODO: Implement TextCtrl_WriteOnText
+	// TODO: Implement TextCtrl_WriteOnText
 	TextToWrite = TextCtrl_Write->GetLineText(0);
 	SetSize(GetSize().x + 1, GetSize().y);
 	SetSize(GetSize().x - 1, GetSize().y);
 }
 
-void GUIMyFrame1::Choice_ElementOnChoice( wxCommandEvent& event )
+void GUIMyFrame1::Choice_ElementOnChoice(wxCommandEvent& event)
 {
-// TODO: Implement Choice_ElementOnChoice
+	// TODO: Implement Choice_ElementOnChoice
 	SetSize(GetSize().x + 1, GetSize().y);
 	SetSize(GetSize().x - 1, GetSize().y);
 }

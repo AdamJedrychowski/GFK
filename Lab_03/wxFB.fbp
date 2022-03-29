@@ -126,6 +126,7 @@
                                 <property name="window_extra_style"></property>
                                 <property name="window_name"></property>
                                 <property name="window_style">wxTAB_TRAVERSAL</property>
+                                <event name="OnMove">UpdateScreen</event>
                                 <event name="OnPaint">m_panel3OnPaint</event>
                             </object>
                         </object>

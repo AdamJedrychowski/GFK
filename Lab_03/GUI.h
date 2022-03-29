@@ -55,6 +55,7 @@ class MyFrame1 : public wxFrame
 		wxChoice* Choice_Element;
 
 		// Virtual event handlers, override them in your derived class
+		virtual void UpdateScreen( wxMoveEvent& event ) { event.Skip(); }
 		virtual void m_panel3OnPaint( wxPaintEvent& event ) { event.Skip(); }
 		virtual void Button_SaveToFileOnButtonClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void CheckBox_LoadBananOnCheckBox( wxCommandEvent& event ) { event.Skip(); }

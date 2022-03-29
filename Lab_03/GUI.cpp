@@ -68,6 +68,7 @@ MyFrame1::MyFrame1( wxWindow* parent, wxWindowID id, const wxString& title, cons
 	this->Centre( wxBOTH );
 
 	// Connect Events
+	m_panel3->Connect( wxEVT_MOVE, wxMoveEventHandler( MyFrame1::UpdateScreen ), NULL, this );
 	m_panel3->Connect( wxEVT_PAINT, wxPaintEventHandler( MyFrame1::m_panel3OnPaint ), NULL, this );
 	Button_SaveToFile->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MyFrame1::Button_SaveToFileOnButtonClick ), NULL, this );
 	CheckBox_LoadBanan->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( MyFrame1::CheckBox_LoadBananOnCheckBox ), NULL, this );
@@ -88,6 +89,7 @@ MyFrame1::MyFrame1( wxWindow* parent, wxWindowID id, const wxString& title, cons
 MyFrame1::~MyFrame1()
 {
 	// Disconnect Events
+	m_panel3->Disconnect( wxEVT_MOVE, wxMoveEventHandler( MyFrame1::UpdateScreen ), NULL, this );
 	m_panel3->Disconnect( wxEVT_PAINT, wxPaintEventHandler( MyFrame1::m_panel3OnPaint ), NULL, this );
 	Button_SaveToFile->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MyFrame1::Button_SaveToFileOnButtonClick ), NULL, this );
 	CheckBox_LoadBanan->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( MyFrame1::CheckBox_LoadBananOnCheckBox ), NULL, this );
