@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{139f8321-c6bb-4891-a554-d0a69ab6f659}</ProjectGuid>
+    <ProjectGuid>{437710ba-4f76-4c49-8a73-9b9a883317bf}</ProjectGuid>
     <RootNamespace>Lab04</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -78,13 +78,17 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\adamj\source\wxWidgets\include;C:\Users\adamj\source\wxWidgets\include\msvc;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\adamj\source\wxWidgets\lib\vc_x64_lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(Path);$(LibraryPath)</LibraryPath>
+    <ExecutablePath>$(VC_ExecutablePath_x64);$(CommonExecutablePath);$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(Path);$(IncludePath)</IncludePath>
+    <ExternalIncludePath />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\adamj\source\wxWidgets\include;C:\Users\adamj\source\wxWidgets\include\msvc;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\adamj\source\wxWidgets\lib\vc_x64_lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(Path);$(LibraryPath)</LibraryPath>
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(Path);$(IncludePath)</IncludePath>
+    <ExternalIncludePath />
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -145,13 +149,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ChartClass.cpp" />
+    <ClCompile Include="ConfigClass.cpp" />
     <ClCompile Include="GUI.cpp" />
     <ClCompile Include="GUIMyFrame1.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ChartClass.h" />
+    <ClInclude Include="ConfigClass.h" />
     <ClInclude Include="GUI.h" />
     <ClInclude Include="GUIMyFrame1.h" />
+    <ClInclude Include="vecmat.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
