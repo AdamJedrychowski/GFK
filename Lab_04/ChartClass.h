@@ -34,7 +34,7 @@ class ChartClass
         double Get_Y_max(); // zwraca y_max
         void Draw(wxDC *dc, int w, int h);  // rysuje wykres
 
-        std::unique_ptr<wxPoint>&& CutTheLines(int w, int h);
+        void CutLinesAndDraw(int w, int h, wxDC* dc, std::vector<wxPoint> &tab);
         void ChartAxes(const int& w, const int& h);
         void UpdateFunctions(const int& w, const int& h);
         void DrawFunction(wxDC *dc);

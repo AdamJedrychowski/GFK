@@ -10,8 +10,6 @@ ChartClass::ChartClass(std::shared_ptr<ConfigClass> c)
     x_step=200;
 
     Function.reserve(x_step * 2);
-    Exp.reserve(x_step * 2);
-    XSin.reserve(x_step * 2);
     DrawChart.reserve(24);
 }
 
@@ -59,10 +57,13 @@ void ChartClass::Draw(wxDC *dc, int w, int h)
 
  ChartAxes(w, h);
  dc->SetPen(wxPen(RGB(0, 0, 255)));
- for (int i = 0; i < DrawChart.size(); i += 2) dc->DrawLine(DrawChart[i], DrawChart[i + 1]);
+ //for (int i = 0; i < DrawChart.size(); i += 2) dc->DrawLine(DrawChart[i], DrawChart[i + 1]);
+ CutLinesAndDraw(w, h, dc, DrawChart);
 
  UpdateFunctions(w, h);
- DrawFunction(dc);
+ dc->SetPen(wxPen(RGB(0, 255, 0)));
+ CutLinesAndDraw(w, h, dc, Function);
+ //DrawFunction(dc);
 
  dc->DrawText(wxString::Format("%lf, %lf, %lf, %lf, %d", x_min, x_max, y_min, y_max, x_step), 20, 20);
 }
@@ -84,14 +85,57 @@ double ChartClass::Get_Y_max()
     return y_max;
 }
 
-std::unique_ptr<wxPoint>&& ChartClass::CutTheLines(int w, int h)
+void ChartClass::CutLinesAndDraw(int w, int h, wxDC *dc, std::vector<wxPoint> &tab)
 {
-    std::unique_ptr<wxPoint> lines(new wxPoint[DrawChart.size()]);
-
-    std::bitset<4> bit;
-    for (int i = 0; i < DrawChart.size(); i+=2)
+    std::bitset<4> A_bit, B_bit;
+    wxPoint A, B;
+    for (int i = 0; i < tab.size(); i+=2)
     {
-        if(-DrawChart[i].y)
+        // bit 3
+        if (y_max - tab[i].y < 0) A_bit.set(3, 1);
+        if (y_max - tab[i + 1].y < 0) B_bit.set(3, 1);
+
+        // bit 2
+        if (tab[i].y - y_min < 0) A_bit.set(2, 1);
+        if (tab[i + 1].y - y_min < 0) B_bit.set(2, 1);
+
+        //bit 1
+        if (tab[i].y - x_max < 0) A_bit.set(1, 1);
+        if (tab[i + 1].y - x_max < 0) B_bit.set(1, 1);
+
+        //bit 0
+        if (x_min - tab[i].y < 0) A_bit.set(0, 1);
+        if (x_min - tab[i + 1].y < 0) B_bit.set(0, 1);////////////////////////check
+
+        if (A_bit == 0 && B_bit == 0)
+        {
+            dc->DrawLine(Function[i], Function[i + 1]); // w obszarze
+            continue;
+        }
+        else if ((A_bit & B_bit) != 0) continue; // poza obszarem
+        
+        if (A_bit[0] || A_bit[1])
+        {
+            A.x = x_min;
+            A.y = tab[i].y + ((A_bit[0]) ? x_min - tab[i].x : x_max - x_min) * (tab[i + 1].y - tab[i].y) / (tab[i + 1].x - tab[i].x);
+        }
+        if (B_bit[0] || B_bit[1])
+        {
+            B.x = x_min;
+            B.y = tab[i + 1].y + ((B_bit[0]) ? x_min - tab[i + 1].x : x_max - x_min) * (tab[i].y - tab[i + 1].y) / (tab[i].x - tab[i + 1].x);
+        }
+
+        if (A_bit[2] || A_bit[3])
+        {
+            A.y = (A_bit[2]) ? y_min : y_max;
+            A.x = tab[i].x + ((A_bit[2]) ? y_min - tab[i].y : y_max - tab[i].y) * (tab[i + 1].x - tab[i].x) / (tab[i + 1].y - tab[i].y);
+        }
+        if (B_bit[2] || B_bit[3])
+        {
+            B.y = (B_bit[2]) ? y_min : y_max;
+            B.x = tab[i + 1].x + ((B_bit[2]) ? y_min - tab[i + 1].y : y_max - tab[i + 1].y) * (tab[i].x - tab[i + 1].x) / (tab[i].y - tab[i + 1].y);
+        }
+        dc->DrawLine(A, B);
     }
 }
 
