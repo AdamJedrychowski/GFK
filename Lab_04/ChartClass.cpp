@@ -11,6 +11,7 @@ ChartClass::ChartClass(std::shared_ptr<ConfigClass> c)
 
     Function.reserve(x_step * 2);
     DrawChart.reserve(24);
+    Text.reserve(6);
 }
 
 void ChartClass::Set_Range()
@@ -67,8 +68,14 @@ void ChartClass::Draw(wxDC *dc, int w, int h)
  dc->SetPen(wxPen(RGB(0, 255, 0)));
  CutLinesAndDraw(w, h, dc, Function);
 
-
- dc->DrawText(wxString::Format("%lf, %lf, %lf, %lf, %d", x_min, x_max, y_min, y_max, x_step), 20, 20);
+ PointTranslation(w, h, Text);
+ dc->SetPen(wxPen(RGB(0, 0, 0)));
+ dc->DrawRotatedText(wxString::Format("%.2lf", x_min / 2.), Text[0], 360 - cfg->Get_Alpha());
+ dc->DrawRotatedText(wxString::Format("%.2lf", x_max / 3.), Text[1], 360 - cfg->Get_Alpha());
+ dc->DrawRotatedText(wxString::Format("%.2lf", x_max * 2 / 3.), Text[2], 360 - cfg->Get_Alpha());
+ dc->DrawRotatedText(wxString::Format("%.2lf", y_min / 2.), Text[3], 360 - cfg->Get_Alpha());
+ dc->DrawRotatedText(wxString::Format("%.2lf", y_max / 3.), Text[4], 360 - cfg->Get_Alpha());
+ dc->DrawRotatedText(wxString::Format("%.2lf", y_max * 2 / 3.), Text[5], 360 - cfg->Get_Alpha());
 }
 
 
@@ -108,7 +115,7 @@ void ChartClass::CutLinesAndDraw(int w, int h, wxDC *dc, std::vector<wxPoint> &t
 
         //bit 0
         if (tab[i].x - xMin < 0) A_bit.set(0, 1);
-        if (tab[i + 1].x - xMin < 0) B_bit.set(0, 1);////////////////////////check
+        if (tab[i + 1].x - xMin < 0) B_bit.set(0, 1);
 
         if (A_bit == 0 && B_bit == 0)
         {
@@ -116,30 +123,52 @@ void ChartClass::CutLinesAndDraw(int w, int h, wxDC *dc, std::vector<wxPoint> &t
             continue;
         }
         else if ((A_bit & B_bit) != 0) continue; // poza obszarem
-        
+
+
         A = tab[i];
         B = tab[i + 1];
-        if (A_bit[0] || A_bit[1]) // poprawic przypadki gdy 2 bity sa ustawione
-        {
-            A.y = ((A_bit[0]) ? xMin : xMax) * (A.y - B.y) / ((double)A.x - B.x) + A.y - A.x * (A.y - B.y) / ((double)A.x - B.x);
-            A.x = (A_bit[0]) ? xMin : xMax;
-        }
-        if (B_bit[0] || B_bit[1])
-        {
-            B.y = ((B_bit[0]) ? xMin : xMax) * (B.y - A.y) / ((double)B.x - A.x) + B.y - B.x * (B.y - A.y) / ((double)B.x - A.x);
-            B.x = (B_bit[0]) ? xMin : xMax;
-        }
+        do {
+            if (A_bit[0] || A_bit[1]) // poprawic przypadki gdy 2 bity sa ustawione
+            {
+                A.y = ((A_bit[0]) ? xMin : xMax) * (A.y - B.y) / ((double)A.x - B.x) + A.y - A.x * (A.y - B.y) / ((double)A.x - B.x);
+                A.x = (A_bit[0]) ? xMin : xMax;
+            }
+            else if (A_bit[2] || A_bit[3])
+            {
+                A.x = (A.x - B.x) * (((A_bit[2]) ? yMin : yMax) - A.y) / ((double)A.y - B.y) + A.x;
+                A.y = (A_bit[2]) ? yMin : yMax;
+            }
 
-        if (A_bit[2] || A_bit[3])
-        {
-            A.x = (A.x - B.x) * (((A_bit[2]) ? yMin : yMax) - A.y) / ((double)A.y - B.y) + A.x;
-            A.y = (A_bit[2]) ? yMin : yMax;
-        }
-        if (B_bit[2] || B_bit[3])
-        {
-            B.x = (B.x - A.x) * (((B_bit[2]) ? yMin : yMax) - B.y) / ((double)B.y - A.y) + B.x;
-            B.y = (B_bit[2]) ? yMin : yMax;
-        }
+            if (B_bit[0] || B_bit[1])
+            {
+                B.y = ((B_bit[0]) ? xMin : xMax) * (B.y - A.y) / ((double)B.x - A.x) + B.y - B.x * (B.y - A.y) / ((double)B.x - A.x);
+                B.x = (B_bit[0]) ? xMin : xMax;
+            }
+            else if (B_bit[2] || B_bit[3])
+            {
+                B.x = (B.x - A.x) * (((B_bit[2]) ? yMin : yMax) - B.y) / ((double)B.y - A.y) + B.x;
+                B.y = (B_bit[2]) ? yMin : yMax;
+            }
+
+            A_bit.reset();
+            B_bit.reset();
+            // bit 3
+            if (yMax - A.y < 0) A_bit.set(3, 1);
+            if (yMax - B.y < 0) B_bit.set(3, 1);
+
+            // bit 2
+            if (A.y - yMin < 0) A_bit.set(2, 1);
+            if (B.y - yMin < 0) B_bit.set(2, 1);
+
+            //bit 1
+            if (xMax - A.x < 0) A_bit.set(1, 1);
+            if (xMax - B.x < 0) B_bit.set(1, 1);
+
+            //bit 0
+            if (A.x - xMin < 0) A_bit.set(0, 1);
+            if (B.x - xMin < 0) B_bit.set(0, 1);
+
+        } while (B_bit.count() || A_bit.count());
         dc->DrawLine(A, B);
     }
 }
@@ -147,48 +176,53 @@ void ChartClass::CutLinesAndDraw(int w, int h, wxDC *dc, std::vector<wxPoint> &t
 void ChartClass::ChartAxes(const int &w, const int &h)
 {
     DrawChart.clear();
-    
-    //double Xcorrelation = -cfg->Get_x0() / (-cfg->Get_x0() + cfg->Get_x1());
-    //// osie wykresu
-    //DrawChart.push_back(wxPoint(w / 2 + x_min / -cfg->Get_x0() * ((w - 20) / 2), h / 2));
-    //DrawChart.push_back(wxPoint(w / 2 + x_max / cfg->Get_x1() * ((w - 20) / 2), h / 2));
-    //DrawChart.push_back(wxPoint(w * Xcorrelation, h / 2 - y_min * ((h - 20) / 4)));
-    //DrawChart.push_back(wxPoint(w * Xcorrelation, h / 2 - y_max * ((h - 20) / 4)));
 
-    double Xcorrelation = fabs(cfg->Get_x0()) / (fabs(cfg->Get_x0()) + cfg->Get_x1());
-    double Xunit_min = ((w * Xcorrelation) / (double)-cfg->Get_x0()),
-        Xunit_max = ((w - 10 - w * Xcorrelation) / (double)cfg->Get_x1());
+    Xcorrelation = fabs(cfg->Get_x0()) / (fabs(cfg->Get_x0()) + cfg->Get_x1());
+    Ycorrelation = fabs(cfg->Get_y0()) / (fabs(cfg->Get_y0()) + cfg->Get_y1());
+    Xunit_min = ((w * Xcorrelation) / (double)-cfg->Get_x0());
+    Xunit_max = ((w - 10 - w * Xcorrelation) / (double)cfg->Get_x1());
+
+    Yunit_min = ((h * Ycorrelation) / (double)-cfg->Get_y0());
+    Yunit_max = ((h - 10 - h * Ycorrelation) / (double)cfg->Get_y1());
+
     // osie wykresu
-    DrawChart.push_back(wxPoint(w * Xcorrelation + x_min * Xunit_min, h / 2));
-    DrawChart.push_back(wxPoint(w * Xcorrelation + x_max * Xunit_max, h / 2));
-    DrawChart.push_back(wxPoint(w * Xcorrelation, h / 2 - y_min * ((h - 20) / 4)));
-    DrawChart.push_back(wxPoint(w * Xcorrelation, h / 2 - y_max * ((h - 20) / 4)));
+    DrawChart.push_back(wxPoint(w * Xcorrelation + x_min * Xunit_min, h * Ycorrelation));
+    DrawChart.push_back(wxPoint(w * Xcorrelation + x_max * Xunit_max, h * Ycorrelation));
+    DrawChart.push_back(wxPoint(w * Xcorrelation, h * Ycorrelation - y_min * Yunit_min));
+    DrawChart.push_back(wxPoint(w * Xcorrelation, h * Ycorrelation - y_max * Yunit_max));
 
     // podzialki na osi x
-    DrawChart.push_back(wxPoint((w * Xcorrelation + w * Xcorrelation + x_min * Xunit_min) / 2., h / 2 - 5));
-    DrawChart.push_back(wxPoint((w * Xcorrelation + w * Xcorrelation + x_min * Xunit_min) / 2., h / 2 + 5));
-    DrawChart.push_back(wxPoint(w * Xcorrelation + (w * Xcorrelation + x_max * Xunit_max - w * Xcorrelation) / 3., h / 2 - 5));
-    DrawChart.push_back(wxPoint(w * Xcorrelation + (w * Xcorrelation + x_max * Xunit_max - w * Xcorrelation) / 3., h / 2 + 5));
-    DrawChart.push_back(wxPoint(w * Xcorrelation + (w * Xcorrelation + x_max * Xunit_max - w * Xcorrelation) * 2 / 3., h / 2 - 5));
-    DrawChart.push_back(wxPoint(w * Xcorrelation + (w * Xcorrelation + x_max * Xunit_max - w * Xcorrelation) * 2 / 3., h / 2 + 5));
+    DrawChart.push_back(wxPoint((2 * w * Xcorrelation + x_min * Xunit_min) / 2., h * Ycorrelation - 5));
+    DrawChart.push_back(wxPoint((2 * w * Xcorrelation + x_min * Xunit_min) / 2., h * Ycorrelation + 5));
+    Text.push_back(wxPoint((2 * w * Xcorrelation + x_min * Xunit_min) / 2., h * Ycorrelation + 10));
+    DrawChart.push_back(wxPoint(w * Xcorrelation + x_max * Xunit_max / 3., h * Ycorrelation - 5));
+    DrawChart.push_back(wxPoint(w * Xcorrelation + x_max * Xunit_max / 3., h * Ycorrelation + 5));
+    Text.push_back(wxPoint(w * Xcorrelation + x_max * Xunit_max / 3., h * Ycorrelation + 10));
+    DrawChart.push_back(wxPoint(w * Xcorrelation + x_max * Xunit_max * 2 / 3., h * Ycorrelation - 5));
+    DrawChart.push_back(wxPoint(w * Xcorrelation + x_max * Xunit_max * 2 / 3., h * Ycorrelation + 5));
+    Text.push_back(wxPoint(w * Xcorrelation + x_max * Xunit_max * 2 / 3., h * Ycorrelation + 10));
+
 
     // podzialki na osi y
-    DrawChart.push_back(wxPoint(w * Xcorrelation - 5, h / 2 - y_min * ((h - 20) / 8)));
-    DrawChart.push_back(wxPoint(w * Xcorrelation + 5, h / 2 - y_min * ((h - 20) / 8)));
-    DrawChart.push_back(wxPoint(w * Xcorrelation - 5, h / 2 - y_max * ((h - 20) / 6)));
-    DrawChart.push_back(wxPoint(w * Xcorrelation + 5, h / 2 - y_max * ((h - 20) / 6)));
-    DrawChart.push_back(wxPoint(w * Xcorrelation - 5, h / 2 - y_max * ((h - 20) / 12)));
-    DrawChart.push_back(wxPoint(w * Xcorrelation + 5, h / 2 - y_max * ((h - 20) / 12)));
+    DrawChart.push_back(wxPoint(w * Xcorrelation - 5, (2 * h * Ycorrelation - y_min * Yunit_min) / 2.));
+    DrawChart.push_back(wxPoint(w * Xcorrelation + 5, (2 * h * Ycorrelation - y_min * Yunit_min) / 2.));
+    Text.push_back(wxPoint(w * Xcorrelation + 10, (2 * h * Ycorrelation - y_min * Yunit_min) / 2.));
+    DrawChart.push_back(wxPoint(w * Xcorrelation - 5, h * Ycorrelation - y_max * Yunit_max / 3.));
+    DrawChart.push_back(wxPoint(w * Xcorrelation + 5, h * Ycorrelation - y_max * Yunit_max / 3.));
+    Text.push_back(wxPoint(w * Xcorrelation + 10, h * Ycorrelation - y_max * Yunit_max / 3.));
+    DrawChart.push_back(wxPoint(w * Xcorrelation - 5, h * Ycorrelation - y_max * Yunit_max * 2 / 3.));
+    DrawChart.push_back(wxPoint(w * Xcorrelation + 5, h * Ycorrelation - y_max * Yunit_max * 2 / 3.));
+    Text.push_back(wxPoint(w * Xcorrelation + 10, h * Ycorrelation - y_max * Yunit_max * 2 / 3.));
 
     // zakonczenia wykresu (strza³ki)
-    DrawChart.push_back(wxPoint(w * Xcorrelation + x_max * Xunit_max, h / 2));
-    DrawChart.push_back(wxPoint(w * Xcorrelation + x_max * Xunit_max - 10, h / 2 - 5));
-    DrawChart.push_back(wxPoint(w * Xcorrelation + x_max * Xunit_max, h / 2));
-    DrawChart.push_back(wxPoint(w * Xcorrelation + x_max * Xunit_max - 10, h / 2 + 5));
-    DrawChart.push_back(wxPoint(w * Xcorrelation, h / 2 - y_max * ((h - 20) / 4)));
-    DrawChart.push_back(wxPoint(w * Xcorrelation - 5 , h / 2 - y_max * ((h - 20) / 4) + 10));
-    DrawChart.push_back(wxPoint(w * Xcorrelation, h / 2 - y_max * ((h - 20) / 4)));
-    DrawChart.push_back(wxPoint(w * Xcorrelation + 5, h / 2 - y_max * ((h - 20) / 4) + 10));
+    DrawChart.push_back(wxPoint(w * Xcorrelation + x_max * Xunit_max, h * Ycorrelation));
+    DrawChart.push_back(wxPoint(w * Xcorrelation + x_max * Xunit_max - 10, h * Ycorrelation - 5));
+    DrawChart.push_back(wxPoint(w * Xcorrelation + x_max * Xunit_max, h * Ycorrelation));
+    DrawChart.push_back(wxPoint(w * Xcorrelation + x_max * Xunit_max - 10, h * Ycorrelation + 5));
+    DrawChart.push_back(wxPoint(w * Xcorrelation, h * Ycorrelation - y_max * Yunit_max));
+    DrawChart.push_back(wxPoint(w * Xcorrelation - 5 , h * Ycorrelation - y_max * Yunit_max + 10));
+    DrawChart.push_back(wxPoint(w * Xcorrelation, h * Ycorrelation - y_max * Yunit_max));
+    DrawChart.push_back(wxPoint(w * Xcorrelation + 5, h * Ycorrelation - y_max * Yunit_max + 10));
 }
 
 
@@ -200,23 +234,24 @@ void ChartClass::UpdateFunctions(const int& w, const int& h)
     double x = x_min;
     for (int i = 0; i < 2 * x_step; i += 2)
     {
-        Function.push_back(wxPoint(w / 2 + x * ((w - 20) / 2), h / 2. - GetFunctionValue(x) * ((h - 20) / 4)));
-        x += dx;
-        Function.push_back(wxPoint(w / 2 + x * ((w - 20) / 2), h / 2. - GetFunctionValue(x) * ((h - 20) / 4)));
+        if (x < 0)
+        {
+            Function.push_back(wxPoint(w * Xcorrelation + x * Xunit_min, h * Ycorrelation - GetFunctionValue(x) * Yunit_min));
+            x += dx;
+            Function.push_back(wxPoint(w * Xcorrelation + x * Xunit_min, h * Ycorrelation - GetFunctionValue(x) * Yunit_min));
+        }
+        else
+        {
+            Function.push_back(wxPoint(w * Xcorrelation + x * Xunit_max, h * Ycorrelation - GetFunctionValue(x) * Yunit_max));
+            x += dx;
+            Function.push_back(wxPoint(w * Xcorrelation + x * Xunit_max, h * Ycorrelation - GetFunctionValue(x) * Yunit_max));
+        }
     }
 }
 
-
 void ChartClass::PointTranslation(const int& w, const int& h, std::vector<wxPoint>& tab)
 {
-    Matrix Rotate;
-    double angle = cfg->Get_Alpha() * M_PI / 180.;
-    Rotate.data[0][0] = cos(angle);
-    Rotate.data[0][1] = -sin(angle);
-    Rotate.data[1][0] = sin(angle);
-    Rotate.data[1][1] = cos(angle);
-    Rotate.data[2][2] = 1;
-
+    // vector translation
     Matrix Move;
     Move.data[0][0] = 1;
     Move.data[1][1] = 1;
@@ -224,22 +259,44 @@ void ChartClass::PointTranslation(const int& w, const int& h, std::vector<wxPoin
     Move.data[0][2] = cfg->Get_dX();
     Move.data[1][2] = cfg->Get_dY();
 
-    //Matrix Scale;
-    //Scale.data[0][0] = cfg->Get_x0() + cfg->Get_x1() + 1;
-    ////Scale.data[1][1] = cfg->Get_y1() / (-cfg->Get_y0() + cfg->Get_y1());
-    //Scale.data[1][1] = 1;
-    //Scale.data[2][2] = 1;
+    // Rotation
+    Matrix Rotate, Transform_1, Transform_2, Operations;
+    double angle = cfg->Get_Alpha() * M_PI / 180.;
+    Rotate.data[0][0] = cos(angle);
+    Rotate.data[0][1] = -sin(angle);
+    Rotate.data[1][0] = sin(angle);
+    Rotate.data[1][1] = cos(angle);
+    Rotate.data[2][2] = 1;
 
-    Matrix Operations = Rotate * Move;
+    Transform_2.data[1][1] = Transform_1.data[1][1] = 1;
+    Transform_2.data[0][0] = Transform_1.data[0][0] = 1;
+    Transform_2.data[2][2] = Transform_1.data[2][2] = 1;
+    if (cfg->RotateScreenCenter())
+    {
+        Transform_1.data[0][2] = w / 2;
+        Transform_2.data[0][2] = -w / 2;
+        Transform_1.data[1][2] = h / 2;
+        Transform_2.data[1][2] = -h / 2;
+        Operations = Transform_1 * Rotate * Transform_2 * Move;
+    }
+    else
+    {
+        Transform_1.data[0][2] = w * Xcorrelation;
+        Transform_2.data[0][2] = -w * Xcorrelation;
+        Transform_1.data[1][2] = h * Ycorrelation;
+        Transform_2.data[1][2] = -h * Ycorrelation;
+        Operations = Move * Transform_1 * Rotate * Transform_2;
+    }
 
-    Vector basic;
+
+    Vector basic, temp;
     for (int i = 0; i < tab.size(); i++)
     {
         basic.data[0] = tab[i].x;
         basic.data[1] = tab[i].y;
         basic.data[2] = 1;
-
-        Vector temp = Operations * basic;
+        
+        temp = Operations * basic;
 
         tab[i].x = temp.data[0];
         tab[i].y = temp.data[1];

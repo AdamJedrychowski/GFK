@@ -23,6 +23,8 @@ class ChartClass
          //poczatek odcinka-liczby parzyste, koniec-nieparzyste
         std::vector<wxPoint> DrawChart; // osie wykresu
         std::vector<wxPoint> Function; // funkcje
+        std::vector<wxPoint> Text;
+        double Xcorrelation, Ycorrelation, Xunit_min, Xunit_max, Yunit_min, Yunit_max;
 
        
         void CutLinesAndDraw(int w, int h, wxDC* dc, std::vector<wxPoint> &tab);
