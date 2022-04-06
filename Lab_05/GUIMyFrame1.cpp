@@ -2,6 +2,8 @@
 #include <vector>
 #include <fstream>
 #include "vecmat.h"
+#include <cmath>
+#define M_PI 3.141592653589
 
 struct Point {
  float x, y, z;
@@ -90,38 +92,97 @@ WxST_ScaleZ->SetLabel(wxString::Format(wxT("%g"), WxSB_ScaleZ->GetValue() / 100.
 Repaint();
 }
 
-Matrix4 TranslationMatrix()
+Matrix4 TranslationMatrix(double x, double y, double z)
 {
     Matrix4 Trans;
-    Trans.data[0][0] =
-    Trans.data[1][1] =
-    Trans.data[2][2] =
-    Trans.data[3][3] =
-    Trans.data[0][3] =
-    Trans.data[1][3] =
-    Trans.data[2][3] =
+    Trans.data[0][0] = 1.;
+    Trans.data[1][1] = 1.;
+    Trans.data[2][2] = 1.;
+    Trans.data[3][3] = 1.;
+    Trans.data[0][3] = x;
+    Trans.data[1][3] = y;
+    Trans.data[2][3] = z;
 
     return Trans;
 }
 
+Matrix4 RotateMartix(int x, int y, int z)
+{
+    Matrix4 RotX;
+    RotX.data[0][0] = 1.;
+    RotX.data[3][3] = 1.;
+    RotX.data[1][1] = cos(x * M_PI / 180.);
+    RotX.data[1][2] = -sin(x * M_PI / 180.);
+    RotX.data[2][1] = sin(x * M_PI / 180.);
+    RotX.data[2][2] = cos(x * M_PI / 180.);
+
+    Matrix4 RotY;
+    RotY.data[1][1] = 1.;
+    RotY.data[3][3] = 1.;
+    RotY.data[0][0] = cos(y * M_PI / 180.);
+    RotY.data[0][2] = sin(y * M_PI / 180.);
+    RotY.data[2][0] = -sin(y * M_PI / 180.);
+    RotY.data[2][2] = cos(y * M_PI / 180.);
+
+    Matrix4 RotZ;
+    RotZ.data[2][2] = 1.;
+    RotZ.data[3][3] = 1.;
+    RotZ.data[0][0] = cos(z * M_PI / 180.);
+    RotZ.data[0][1] = -sin(z * M_PI / 180.);
+    RotZ.data[1][0] = sin(z * M_PI / 180.);
+    RotZ.data[1][1] = cos(z * M_PI / 180.);
+
+    return RotX * RotY * RotZ;
+}
+
+Matrix4 ScaleMatrix(double x, double y, double z)
+{
+    Matrix4 Scale;
+    Scale.data[0][0] = x;
+    Scale.data[1][1] = y;
+    Scale.data[2][2] = z;
+    Scale.data[3][3] = 1.;
+
+    return Scale;
+}
+
+Point MakeOperations(Point A, Matrix4 &Trans, Matrix4 &Rot, Matrix4 &Scale)
+{
+    Vector4 XYZ;
+    XYZ.Set(A.x, A.y, A.z);
+
+    XYZ = Rot * Trans * Scale * XYZ;
+
+    return Point(XYZ.GetX(), XYZ.GetY(), XYZ.GetZ());
+}
 
 void GUIMyFrame1::Repaint()
 {
     wxClientDC dc1(WxPanel);
     wxBufferedDC dc(&dc1);
     dc.Clear();
-    float d = 2.0;
     int width, height;
     dc.GetSize(&width, &height);
-    Matrix4 Translation;
 
+    Matrix4 Translation = TranslationMatrix((WxSB_TranslationX->GetValue() - 100.) / 50.,
+        (WxSB_TranslationY->GetValue() - 100.) / 50., (WxSB_TranslationZ->GetValue() - 100.) / 50.);
 
+    Matrix4 Rotate = RotateMartix(WxSB_RotateX->GetValue(),
+        WxSB_RotateY->GetValue(), WxSB_RotateZ->GetValue());
+
+    Matrix4 Scale = ScaleMatrix(WxSB_ScaleX->GetValue() / 100.,
+        WxSB_ScaleY->GetValue() / 100., WxSB_ScaleZ->GetValue() / 100.);
 
 
     for (Segment& it : data)
     {
-        wxPoint A(width / 2 * (1 + (it.begin.x * d) / (it.begin.z + d)), height / 2 * (1 - (it.begin.y * d) / (it.begin.z + d))),
-            B(width / 2 * (1 + (it.end.x * d) / (it.end.z + d)), height / 2 * (1 - (it.end.y * d) / (it.end.z + d)));
+        Point Begin = MakeOperations(it.begin, Translation, Rotate, Scale),
+            End = MakeOperations(it.end, Translation, Rotate, Scale);
+
+        wxPoint A(width / 2 * (1 + (Begin.x * 2.0) / (Begin.z + 2.0)), height / 2 * (1 - (Begin.y * 2.0) / (Begin.z + 2.0))),
+            B(width / 2 * (1 + (End.x * 2.0) / (End.z + 2.0)), height / 2 * (1 - (End.y * 2.0) / (End.z + 2.0)));
+
+        
         dc.SetPen(wxPen(it.color));
         dc.DrawLine(A, B);
     }
