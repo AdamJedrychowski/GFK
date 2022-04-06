@@ -6,12 +6,12 @@
 struct Point {
  float x, y, z;
  Point(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
- operator wxPoint();
 };
 
 struct Color {
  int R, G, B;
  Color(int _R, int _G, int _B) : R(_R), G(_G), B(_B) {}
+ operator wxColour() { return wxColour(R, G, B); }
 };
 
 struct Segment {
@@ -90,14 +90,39 @@ WxST_ScaleZ->SetLabel(wxString::Format(wxT("%g"), WxSB_ScaleZ->GetValue() / 100.
 Repaint();
 }
 
+Matrix4 TranslationMatrix()
+{
+    Matrix4 Trans;
+    Trans.data[0][0] =
+    Trans.data[1][1] =
+    Trans.data[2][2] =
+    Trans.data[3][3] =
+    Trans.data[0][3] =
+    Trans.data[1][3] =
+    Trans.data[2][3] =
+
+    return Trans;
+}
+
 
 void GUIMyFrame1::Repaint()
 {
     wxClientDC dc1(WxPanel);
     wxBufferedDC dc(&dc1);
-    for (int i = 0; i < data.size(); i++)
+    dc.Clear();
+    float d = 2.0;
+    int width, height;
+    dc.GetSize(&width, &height);
+    Matrix4 Translation;
+
+
+
+
+    for (Segment& it : data)
     {
-        dc.SetPen(wxPen(data[i].color.R, data[i].color.G, data[i].color.B));
-        dc.DrawLine(data[i].begin, data[i].end);
+        wxPoint A(width / 2 * (1 + (it.begin.x * d) / (it.begin.z + d)), height / 2 * (1 - (it.begin.y * d) / (it.begin.z + d))),
+            B(width / 2 * (1 + (it.end.x * d) / (it.end.z + d)), height / 2 * (1 - (it.end.y * d) / (it.end.z + d)));
+        dc.SetPen(wxPen(it.color));
+        dc.DrawLine(A, B);
     }
 }
