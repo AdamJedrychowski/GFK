@@ -48,6 +48,8 @@ class GUIMyFrame1 : public MyFrame1
   void Contrast(int value);       // funkcja zmieniajaca kontrast obrazka
   void Repaint();
 
+	private:
+		bool ClearScreen = 0;
 };
 
 #endif // __GUIMyFrame1__
