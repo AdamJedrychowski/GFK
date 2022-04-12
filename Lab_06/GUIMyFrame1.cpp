@@ -102,16 +102,83 @@ void GUIMyFrame1::m_b_prewitt_click( wxCommandEvent& event )
 {
  // TO DO: Pionowa maska Prewitta
 	Img_Cpy = Img_Org.Copy();
-
-	unsigned int pixelcount = Img_Cpy.GetHeight() * Img_Cpy.GetWidth();
+	int h = Img_Cpy.GetHeight(), w = Img_Cpy.GetWidth();
+	unsigned int pixelcount = h * w;
+	std::vector<unsigned char> ImgNew;
+	ImgNew.reserve(pixelcount);
 	unsigned char* data = Img_Cpy.GetData();
-	int R, G, B, sum;
-	for (unsigned int i = 0; i < pixelcount; i++) {
-		sum = 0;
+	int sum, neighbor, Color;
+	for (unsigned int i = 0; i < pixelcount; i++)
+	{
+		//for (int j = 0; j < 3; j++)
+		{
+			neighbor = 0;
+			sum = (int)*data;
 
+			if (i < w)
+			{
+				if (i == 0)
+				{
+					neighbor += (int)*(data + 3) + (int)*(data + 3 * (w + 1));
+					sum += (int)*(data + 3 * w) + (int)*(data + 3) + (int)*(data + 3 * (w + 1));
+				}
+				else if (i == w - 1)
+				{
+					neighbor += -(int)*(data - 3) - (int)*(data + 3 * (w - 1));
+					sum += (int)*(data - 3) + (int)*(data + 3 * (w - 1)) + (int)*(data + 3 * w);
+				}
+				else
+				{
+					neighbor += (int)*(data + 3) + (int)*(data + 3 * (w + 1)) - (int)*(data - 3) - (int)*(data + 3 * (w - 1));
+					sum += (int)*(data + 3) + (int)*(data + 3 * (w + 1)) + (int)*(data - 3) + (int)*(data + 3 * (w - 1)) + (int)*(data + 3 * w);
+				}
+			}
+			else if (i >= w * (h - 1))
+			{
+				if (i % w == 0)
+				{
+					neighbor += (int)*(data + 3) + (int)*(data - 3 * (w - 1));
+					sum += (int)*(data + 3) + (int)*(data - 3 * (w - 1)) + (int)*(data - 3 * w);
+				}
+				else if (i == w * h - 1)
+				{
+					neighbor += -(int)*(data - 3) - (int)*(data - 3 * (w + 1));
+					sum += (int)*(data - 3) + (int)*(data - 3 * (w + 1)) + (int)*(data - 3 * w);
+				}
+				else
+				{
+					neighbor += (int)*(data + 3) + (int)*(data - 3 * (w - 1)) - (int)*(data - 3) - (int)*(data - 3 * (w + 1));
+					sum += (int)*(data + 3) + (int)*(data - 3 * (w - 1)) + (int)*(data - 3) + (int)*(data - 3 * (w + 1)) + (int)*(data - 3 * w);
+				}
+			}
+			else if (i % w == 0)
+			{
+				neighbor += (int)*(data + 3) + (int)*(data - 3 * (w - 1)) + (int)*(data + 3 * (w + 1));
+				sum += (int)*(data + 3) + (int)*(data - 3 * (w - 1)) + (int)*(data + 3 * (w + 1)) + (int)*(data + 3 * w) + (int)*(data - 3 * w);
+			}
+			else if (i % w == w - 1)
+			{
+				neighbor += -(int)*(data - 3) - (int)*(data - 3 * (w + 1)) - (int)*(data + 3 * (w - 1));
+				sum += (int)*(data - 3) + (int)*(data - 3 * (w + 1)) + (int)*(data + 3 * (w - 1)) + (int)*(data + 3 * w) + (int)*(data - 3 * w);
+			}
+			else
+			{
+				neighbor += (int)*(data + 3) + (int)*(data - 3 * (w - 1)) + (int)*(data + 3 * (w + 1)) - (int)*(data - 3) -
+					(int)*(data - 3 * (w + 1)) - (int)*(data + 3 * (w - 1));
 
-		data += 3;
+				sum += (int)*(data - 3) + (int)*(data - 3 * (w + 1)) + (int)*(data + 3 * (w - 1)) + (int)*(data + 3 * w) +
+					(int)*(data - 3 * w) + (int)*(data + 3) + (int)*(data - 3 * (w - 1)) + (int)*(data + 3 * (w + 1));
+			}
+
+			Color = (sum) ? neighbor / sum : 0;
+			if (Color > 255) Color = 255;
+			else if (Color < 0) Color = 0;
+			ImgNew.push_back(Color);
+			data++;
+		}
 	}
+
+	for (int i = 0; i < pixelcount; i++) data[i] = ImgNew[i];
 }
 
 void GUIMyFrame1::m_b_threshold_click( wxCommandEvent& event )
