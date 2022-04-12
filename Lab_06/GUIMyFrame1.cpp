@@ -105,12 +105,12 @@ void GUIMyFrame1::m_b_prewitt_click( wxCommandEvent& event )
 	int h = Img_Cpy.GetHeight(), w = Img_Cpy.GetWidth();
 	unsigned int pixelcount = h * w;
 	std::vector<unsigned char> ImgNew;
-	ImgNew.reserve(pixelcount);
+	ImgNew.reserve(pixelcount*3);
 	unsigned char* data = Img_Cpy.GetData();
 	int sum, neighbor, Color;
 	for (unsigned int i = 0; i < pixelcount; i++)
 	{
-		//for (int j = 0; j < 3; j++)
+		for (int j = 0; j < 3; j++)
 		{
 			neighbor = 0;
 			sum = (int)*data;
@@ -177,8 +177,8 @@ void GUIMyFrame1::m_b_prewitt_click( wxCommandEvent& event )
 			data++;
 		}
 	}
-
-	for (int i = 0; i < pixelcount; i++) data[i] = ImgNew[i];
+	data = Img_Cpy.GetData();
+	for (int i = 0; i < pixelcount*3; i++) data[i] = ImgNew[i];
 }
 
 void GUIMyFrame1::m_b_threshold_click( wxCommandEvent& event )
