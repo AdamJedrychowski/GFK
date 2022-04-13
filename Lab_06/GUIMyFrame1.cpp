@@ -123,6 +123,7 @@ void GUIMyFrame1::m_b_prewitt_click( wxCommandEvent& event )
 	}
 	data = Img_Cpy.GetData();
 	for (int i = 0; i < pixelcount*3; i++) data[i] = ImgNew[i];
+	ClearScreen = 1;
 }
 
 void GUIMyFrame1::m_b_threshold_click( wxCommandEvent& event )
@@ -130,6 +131,15 @@ void GUIMyFrame1::m_b_threshold_click( wxCommandEvent& event )
  // TO DO: Prog o wartosci 128 dla kazdego kanalu niezaleznie
 	Img_Cpy = Img_Org.Copy();
 
+	unsigned int pixelcount = Img_Cpy.GetHeight() * Img_Cpy.GetWidth();
+	unsigned char* data = Img_Cpy.GetData();
+	for (unsigned int i = 0; i < pixelcount; i++) {
+		data[0] = data[0] / 127 * 255;
+		data[1] = data[1] / 127 * 255;
+		data[2] = data[2] / 127 * 255;
+
+		data += 3;
+	}
 	ClearScreen = 1;
 }
 
