@@ -60,7 +60,7 @@ void GUIMyFrame1::m_b_rotate_click( wxCommandEvent& event )
 {
  // TO DO: Obrot o 30 stopni
 	Img_Cpy = Img_Org.Copy();
-	Img_Cpy = Img_Cpy.Rotate(30 * 180. / M_PI, wxPoint(Img_Cpy.GetSize().x / 2., Img_Cpy.GetSize().y / 2.)); // dlaczego tak jest????
+	Img_Cpy = Img_Cpy.Rotate(30 * M_PI / 180., wxPoint(Img_Cpy.GetSize().x / 2., Img_Cpy.GetSize().y / 2.)); // dlaczego tak jest????
 	ClearScreen = 1;
 }
 
@@ -107,73 +107,17 @@ void GUIMyFrame1::m_b_prewitt_click( wxCommandEvent& event )
 	std::vector<unsigned char> ImgNew;
 	ImgNew.reserve(pixelcount*3);
 	unsigned char* data = Img_Cpy.GetData();
-	int sum, neighbor, Color;
+	int sum;
 	for (unsigned int i = 0; i < pixelcount; i++)
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			neighbor = 0;
-			sum = (int)*data;
+			if (i % w == 0) sum = (int)*(data + 3);
+			else if (i % w == w - 1) sum = -(int)*(data - 3);
+			else sum = -(int)*(data - 3) + (int)*(data + 3);
 
-			if (i < w)
-			{
-				if (i == 0)
-				{
-					neighbor += (int)*(data + 3) + (int)*(data + 3 * (w + 1));
-					sum += (int)*(data + 3 * w) + (int)*(data + 3) + (int)*(data + 3 * (w + 1));
-				}
-				else if (i == w - 1)
-				{
-					neighbor += -(int)*(data - 3) - (int)*(data + 3 * (w - 1));
-					sum += (int)*(data - 3) + (int)*(data + 3 * (w - 1)) + (int)*(data + 3 * w);
-				}
-				else
-				{
-					neighbor += (int)*(data + 3) + (int)*(data + 3 * (w + 1)) - (int)*(data - 3) - (int)*(data + 3 * (w - 1));
-					sum += (int)*(data + 3) + (int)*(data + 3 * (w + 1)) + (int)*(data - 3) + (int)*(data + 3 * (w - 1)) + (int)*(data + 3 * w);
-				}
-			}
-			else if (i >= w * (h - 1))
-			{
-				if (i % w == 0)
-				{
-					neighbor += (int)*(data + 3) + (int)*(data - 3 * (w - 1));
-					sum += (int)*(data + 3) + (int)*(data - 3 * (w - 1)) + (int)*(data - 3 * w);
-				}
-				else if (i == w * h - 1)
-				{
-					neighbor += -(int)*(data - 3) - (int)*(data - 3 * (w + 1));
-					sum += (int)*(data - 3) + (int)*(data - 3 * (w + 1)) + (int)*(data - 3 * w);
-				}
-				else
-				{
-					neighbor += (int)*(data + 3) + (int)*(data - 3 * (w - 1)) - (int)*(data - 3) - (int)*(data - 3 * (w + 1));
-					sum += (int)*(data + 3) + (int)*(data - 3 * (w - 1)) + (int)*(data - 3) + (int)*(data - 3 * (w + 1)) + (int)*(data - 3 * w);
-				}
-			}
-			else if (i % w == 0)
-			{
-				neighbor += (int)*(data + 3) + (int)*(data - 3 * (w - 1)) + (int)*(data + 3 * (w + 1));
-				sum += (int)*(data + 3) + (int)*(data - 3 * (w - 1)) + (int)*(data + 3 * (w + 1)) + (int)*(data + 3 * w) + (int)*(data - 3 * w);
-			}
-			else if (i % w == w - 1)
-			{
-				neighbor += -(int)*(data - 3) - (int)*(data - 3 * (w + 1)) - (int)*(data + 3 * (w - 1));
-				sum += (int)*(data - 3) + (int)*(data - 3 * (w + 1)) + (int)*(data + 3 * (w - 1)) + (int)*(data + 3 * w) + (int)*(data - 3 * w);
-			}
-			else
-			{
-				neighbor += (int)*(data + 3) + (int)*(data - 3 * (w - 1)) + (int)*(data + 3 * (w + 1)) - (int)*(data - 3) -
-					(int)*(data - 3 * (w + 1)) - (int)*(data + 3 * (w - 1));
-
-				sum += (int)*(data - 3) + (int)*(data - 3 * (w + 1)) + (int)*(data + 3 * (w - 1)) + (int)*(data + 3 * w) +
-					(int)*(data - 3 * w) + (int)*(data + 3) + (int)*(data - 3 * (w - 1)) + (int)*(data + 3 * (w + 1));
-			}
-
-			Color = (sum) ? neighbor / sum : 0;
-			if (Color > 255) Color = 255;
-			else if (Color < 0) Color = 0;
-			ImgNew.push_back(Color);
+			if (abs(sum) > 255) sum = 255;
+			ImgNew.push_back(abs(sum));
 			data++;
 		}
 	}
