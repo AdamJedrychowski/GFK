@@ -151,7 +151,7 @@ Point MakeOperations(Point A, Matrix4 &Trans, Matrix4 &Rot, Matrix4 &Scale)
     Vector4 XYZ;
     XYZ.Set(A.x, A.y, A.z);
 
-    XYZ = Rot * Trans * Scale * XYZ;
+    XYZ = Trans * Rot * Scale * XYZ;
 
     return Point(XYZ.GetX(), XYZ.GetY(), XYZ.GetZ());
 }
@@ -176,6 +176,9 @@ void GUIMyFrame1::Repaint()
 
     for (Segment& it : data)
     {
+        it.color.R = 127 + it.begin.y * 128;
+        it.color.B = 127 - it.begin.y * 128;
+
         Point Begin = MakeOperations(it.begin, Translation, Rotate, Scale),
             End = MakeOperations(it.end, Translation, Rotate, Scale);
 
