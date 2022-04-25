@@ -20,4 +20,5 @@ public:
 	Circle(int num, const char* text, sf::Font &font, sf::PrimitiveType type, Color* wsk, int x, int y);
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+	void ChangeShade(double NewValue);
 };

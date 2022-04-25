@@ -15,13 +15,13 @@ public:
 class HSLColor : public Color
 {
 	sf::Color Convert(double, double, double) override;
-	std::string GetZ() override { return std::string("=" + std::to_string(Z)); }
+	std::string GetZ() override { return std::string("=" + std::to_string(Z / 100).substr(0, 4)); }
 };
 
 class HSVColor : public Color
 {
 	sf::Color Convert(double, double, double) override;
-	std::string GetZ() override { return std::string("=" + std::to_string(Z)); }
+	std::string GetZ() override { return std::string("=" + std::to_string(Z / 100).substr(0, 4)); }
 };
 
 class CMYColor : public Color

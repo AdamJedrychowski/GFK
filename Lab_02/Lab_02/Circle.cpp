@@ -53,3 +53,9 @@ void Circle::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	target.draw(Name[0]);
 	target.draw(Name[1]);
 }
+
+
+void Circle::ChangeShade(double NewValue)
+{
+	
+}

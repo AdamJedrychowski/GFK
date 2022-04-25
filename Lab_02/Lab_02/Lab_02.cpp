@@ -16,7 +16,7 @@ int main()
 
 
     unsigned int FPS = 0, frame_counter = 0;
-
+    bool HoldingMouseButton = false;
     //inicjalizacja 
     clock.restart().asMilliseconds();
     while (window.isOpen())
@@ -27,28 +27,30 @@ int main()
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed) window.close();
-            /*if (event.mouseButton.x > 610 && event.mouseButton.x < 650 && event.mouseButton.y >= 10 && event.mouseButton.y <= 280)
+            if (event.mouseButton.x > 610 && event.mouseButton.x < 650 && event.mouseButton.y >= 10 && event.mouseButton.y <= 280)
             {
-                if (!render.HoldingMouseButton && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+                if (!HoldingMouseButton && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
                 {
-                    render.ChangeShade(event, window);
-                    render.HoldingMouseButton = true;
+                    
+                    HoldingMouseButton = true;
                 }
-                else if (render.HoldingMouseButton && event.type == sf::Event::MouseButtonReleased)
+                else if (HoldingMouseButton && event.type == sf::Event::MouseButtonReleased)
                 {
-                    render.HoldingMouseButton = false;
-                    render.ChangeShade(event, window);
+                    HoldingMouseButton = false;
+                    
                 }
             }
-            else if (render.HoldingMouseButton && event.mouseMove.x > 610 && event.mouseMove.x < 650 && event.mouseMove.y >= 10 && event.mouseMove.y <= 280)
+            else if (HoldingMouseButton && event.mouseMove.x > 610 && event.mouseMove.x < 650 && event.mouseMove.y >= 10 && event.mouseMove.y <= 280)
             {
-                render.ChangeShade(event, window);
-            }*/
+                
+            }
 
         }
         //tu wyrysowaæ wszystko na ekran
-        //render.getActualWindow().display();
-        //window.draw(render);
+        window.draw(HSL);
+        window.draw(HSV);
+        window.draw(CMY);
+        window.draw(RGB);
 
 
         ////tu wypisaæ na ekran wartoœæ FPS
@@ -61,10 +63,6 @@ int main()
         //}
         //frame_counter++;
         //window.draw(render.FPScounter[1]);
-        window.draw(HSL);
-        window.draw(HSV);
-        window.draw(CMY);
-        window.draw(RGB);
 
         window.display();
     }
