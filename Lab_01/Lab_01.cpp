@@ -1,5 +1,4 @@
-﻿// Calosc mozna dowolnie edytowac wedle uznania. 
-#include "pch.h"
+﻿#include "pch.h"
 #include "font.h"
 #include "Interaction.h"
 
