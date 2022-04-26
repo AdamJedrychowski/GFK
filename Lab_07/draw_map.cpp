@@ -1,7 +1,6 @@
 #include <wx/wx.h>
 #include "GUIMyFrame1.h"
 #include <vector>
-// UWAGA: TO JEST JEDYNY PLIK, KTORY NALEZY EDYTOWAC **************************
 
 float ShepardMethod(const wxRealPoint& A, const float (*GivenPoint)[3], int N)
 {
@@ -36,7 +35,76 @@ std::vector<std::vector<double>> Interpolation(const float(*GivenPoint)[3], int 
     return tab;
 }
 
+void drawMap(unsigned char* data, std::vector<std::vector<double>> &InterpolationMap, float MinValue, float ScaleOfColor, int MappingType)
+{
+    float _R, _G, _B, MapColor;
 
+    for (int i = 0; i < 500; i++)
+    {
+        for (int j = 0; j < 500; j++)
+        {
+            if (data[0] == 0) continue;
+            MapColor = (InterpolationMap[i][j] - MinValue) * ScaleOfColor;
+            
+            switch (MappingType)
+            {
+            case 1:
+                _R = 255 - MapColor;
+                _G = 0;
+                _B = MapColor;
+                break;
+            case 2:
+                _R = 255 - MapColor * 2;
+                _G = (MapColor < 126) ? MapColor * 2 : 255 - (MapColor - 126) * 2;
+                _B = (MapColor < 126) ? 0 : (MapColor - 126) * 2;
+                break;
+            case 3:
+                _R = MapColor;
+                _G = MapColor;
+                _B = MapColor;
+                break;
+            }
+            if (_R < 0) _R = 0;
+            else if (_R > 255) _R = 255;
+            if (_G < 0) _G = 0;
+            else if (_G > 255) _G = 255;
+            if (_B < 0) _B = 0;
+            else if (_B > 255) _B = 255;
+            data[0] = _R;
+            data[1] = _G;
+            data[2] = _B;
+
+            data += 3;
+        }
+    }
+}
+
+void drawContour(unsigned char* data, std::vector<std::vector<double>>& InterpolationMap, int NoLevels, float *Levels)
+{
+    for (int i = 0; i < 500; i++)
+    {
+        for (int j = 0; j < 500; j++)
+        {
+            if (j < 499)
+                for (int k = 0; k < NoLevels; k++)
+                    if ((InterpolationMap[i][j] <= Levels[k] && Levels[k] <= InterpolationMap[i][j + 1]) ||
+                        (InterpolationMap[i][j] >= Levels[k] && Levels[k] >= InterpolationMap[i][j + 1]))
+                    {
+                        data[0] = data[1] = data[2] = 0;
+                    }
+
+            if (i < 499)
+                for (int k = 0; k < NoLevels; k++)
+                    if ((InterpolationMap[i][j] <= Levels[k] && Levels[k] <= InterpolationMap[i + 1][j]) ||
+                        (InterpolationMap[i][j] >= Levels[k] && Levels[k] >= InterpolationMap[i + 1][j]))
+                    {
+                        data[0] = data[1] = data[2] = 0;
+                    }
+
+            data += 3;
+        }
+    }
+}
 
 void GUIMyFrame1::DrawMap(int N, float d[100][3], bool Contour, int MappingType, int NoLevels, bool ShowPoints)
 {
@@ -48,95 +116,24 @@ void GUIMyFrame1::DrawMap(int N, float d[100][3], bool Contour, int MappingType,
          if (MinValue > d[i][2]) MinValue = d[i][2];
          if (MaxValue < d[i][2]) MaxValue = d[i][2];
      }
-     float ScaleOfColor = 255 / (MaxValue - MinValue), temp;
+     float ScaleOfColor = 255 / (MaxValue - MinValue), Step;
 
      // Numbers of levels and their value
-     temp = (MaxValue - MinValue) / (NoLevels + 1);
-     Levels[0] = MinValue + temp;
-     //Levels[0] = floor(Levels[0] * 100) / 100.;
-     for (int i = 1; i < NoLevels; i++) Levels[i] = Levels[i - 1] + temp;
+     Step = (MaxValue - MinValue) / (NoLevels + 1);
+     Levels[0] = MinValue + Step;
+     for (int i = 1; i < NoLevels; i++) Levels[i] = Levels[i - 1] + Step;
     
 
      // Creating complete image of map
+     std::vector<std::vector<double>> InterpolationMap = Interpolation(d, N);
+     
      image.Clear(255);
      unsigned char* data = image.GetData();
-     wxRealPoint A(-2.5, 2.5), B(-2.49, 2.5), C(-2.5, 2.49);
-     float Avalue, Bvalue, Cvalue, _R, _G, _B;
-     Avalue = ShepardMethod(A, d, N);
-     for (int i = 0; i < 250000; i++)
-     {
-         if(i && i%500==0)
-         {
-             C.x = A.x = -2.5;
-             B.x = -2.49;
-             B.y = A.y -= 0.01;
-             C.y -= 0.01;
-             
-             Avalue = ShepardMethod(A, d, N);
-         }
-         Bvalue = ShepardMethod(B, d, N);
-         
-         
-         temp = (Avalue - MinValue) * ScaleOfColor;
 
-         if (MappingType)
-         {
-             switch (MappingType)
-             {
-             case 1:
-                 _R = 255 - temp;
-                 _G = 0;
-                 _B = temp;
-                 break;
-
-             case 2:
-                 _R = 255 - temp * 2;
-                 _G = (temp < 126) ? temp * 2 : 255 - (temp - 126) * 2;
-                 _B = (temp < 126) ? 0 : (temp - 126) * 2;
-                 break;
-
-             case 3:
-                 _R = temp;
-                 _G = temp;
-                 _B = temp;
-                 break;
-             }
-             if (_R < 0) _R = 0;
-             else if (_R > 255) _R = 255;
-             if (_G < 0) _G = 0;
-             else if (_G > 255) _G = 255;
-             if (_B < 0) _B = 0;
-             else if (_B > 255) _B = 255;
-             data[0] = _R;
-             data[1] = _G;
-             data[2] = _B;
-         }
-
-
-         if (Contour)
-         {
-             for(int j=0; j<NoLevels; j++)
-                 if((Avalue <= Levels[j] && Levels[j] <= Bvalue) || (Avalue >= Levels[j] && Levels[j] >= Bvalue))
-                 {
-                     data[0] = data[1] = data[2] = 0;
-                 }
-             if (i < 249500)
-             {
-                 Cvalue = ShepardMethod(C, d, N);
-                 for (int j = 0; j < NoLevels; j++)
-                     if ((Avalue <= Levels[j] && Levels[j] <= Cvalue) || (Avalue >= Levels[j] && Levels[j] >= Cvalue))
-                     {
-                         data[0] = data[1] = data[2] = 0;
-                     }
-             }
-         }
-
-         C.x = A.x += 0.01;
-         B.x += 0.01;
-         Avalue = Bvalue;
-         data += 3;
-     }
-
+     // Draw Colored Map
+     if (MappingType) drawMap(data, InterpolationMap, MinValue, ScaleOfColor, MappingType);
+     // Draw Contour
+     if (Contour) drawContour(data, InterpolationMap, NoLevels, Levels);
 
      wxMemoryDC memDC;
      memDC.SelectObject(MemoryBitmap);
