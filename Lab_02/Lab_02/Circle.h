@@ -4,8 +4,11 @@
 #include <iostream>
 #include <cmath>
 #include <memory>
+#include <cstring>
+#include <iostream>
 #define M_PI 3.14159265358979323846
 class Color;
+
 
 class Circle : public sf::Drawable
 {
@@ -19,6 +22,7 @@ private:
 public:
 	Circle(int num, const char* text, sf::Font &font, sf::PrimitiveType type, Color* wsk, int x, int y);
 
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-	void ChangeShade(double NewValue);
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+
+	void ChangeShade(sf::Event& event, bool HoldingMouseButton, int NewShade);
 };

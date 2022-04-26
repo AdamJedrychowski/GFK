@@ -1,10 +1,11 @@
 #include <wx/wx.h>
 #include "GUIMyFrame1.h"
+#include <vector>
 // UWAGA: TO JEST JEDYNY PLIK, KTORY NALEZY EDYTOWAC **************************
 
 float ShepardMethod(const wxRealPoint& A, const float (*GivenPoint)[3], int N)
 {
-    long double weight, numerator = 0, denominator = 0;
+    float weight, numerator = 0, denominator = 0;
     for (int i = 0; i < N; i++)
     {
         weight = 1 / abs((A.x - GivenPoint[i][0]) * (A.x - GivenPoint[i][0]) + (A.y - GivenPoint[i][1]) * (A.y - GivenPoint[i][1]));
@@ -16,9 +17,30 @@ float ShepardMethod(const wxRealPoint& A, const float (*GivenPoint)[3], int N)
 }
 
 
+std::vector<std::vector<double>> Interpolation(const float(*GivenPoint)[3], int N)
+{
+    std::vector<std::vector<double>> tab;
+    tab.resize(500);
+    wxRealPoint A(-2.5, 2.5);
+    for (int i = 0; i < 500; i++)
+    {
+        tab[i].resize(500);
+        for (int j = 0; j < 500; j++)
+        {
+            tab[i][j] = ShepardMethod(A, GivenPoint, N);
+            A.x += 0.01;
+        }
+        A.x = -2.5;
+        A.y -= 0.01;
+    }
+    return tab;
+}
+
+
+
 void GUIMyFrame1::DrawMap(int N, float d[100][3], bool Contour, int MappingType, int NoLevels, bool ShowPoints)
 {
-
+     
      // Minnimal and Maximal value
      float MinValue = d[0][2], MaxValue = d[0][2], Levels[9];
      for (int i = 1; i < N; i++)

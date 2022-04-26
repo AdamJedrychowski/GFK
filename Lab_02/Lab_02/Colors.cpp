@@ -107,9 +107,9 @@ sf::Color HSVColor::Convert(double H, double S, double V)
 
 sf::Color CMYColor::Convert(double C, double M, double _Y)
 {
-    X = round((255 - C) * 100 / 255.);
-    Y = round((255 - M) * 100 / 255.);
-    Z = round((255 - _Y) * 100 / 255.);
+    X = C;
+    Y = M;
+    Z = 255 - _Y;
     return sf::Color(255 - C, 255 - M, 255 - _Y);
 }
 

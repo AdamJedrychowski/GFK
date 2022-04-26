@@ -55,7 +55,23 @@ void Circle::draw(sf::RenderTarget& target, sf::RenderStates states) const
 }
 
 
-void Circle::ChangeShade(double NewValue)
+void Circle::ChangeShade(sf::Event& event, bool HoldingMouseButton, int NewShade)
 {
-	
+	if (FadeCircle.getPrimitiveType() == sf::TriangleFan)
+	{
+		NewShade = NewShade * 100 / 270.;
+		for (int i = 0; i < PointsNumber; i++)
+		{
+			FadeCircle[i].color = ConvertColor[i].Convert(ConvertColor[i].X, ConvertColor[i].Y, 100 - NewShade);
+		}
+	}
+	else if (FadeCircle.getPrimitiveType() == sf::TriangleStrip)
+	{
+		NewShade = NewShade * 255 / 270.;
+		for (int i = 0; i < PointsNumber; i++)
+		{
+			FadeCircle[i].color = ConvertColor[i].Convert(ConvertColor[i].X, ConvertColor[i].Y, 255 - NewShade);
+		}
+	}
+	Name[1].setString(char(Name[0].getString()[2]) + ConvertColor[0].GetZ());
 }

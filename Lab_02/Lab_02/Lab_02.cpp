@@ -1,4 +1,5 @@
 #include "Circle.h"
+#include "GUI.h"
 #include "font.h"
 
 int main()
@@ -14,11 +15,20 @@ int main()
     Circle CMY(724, "CMY", font, sf::TriangleStrip, new CMYColor[724], 150, 440);
     Circle RGB(724, "RGB", font, sf::TriangleStrip, new RGBColor[724], 440, 440);
 
+    GUI Interaction(font);
+    int PointerPosition = 135;
 
+    bool HoldingMouseButton = false, LetsDraw = false;
     unsigned int FPS = 0, frame_counter = 0;
-    bool HoldingMouseButton = false;
-    //inicjalizacja 
     clock.restart().asMilliseconds();
+
+    window.clear(sf::Color::White);
+    window.draw(HSL);
+    window.draw(HSV);
+    window.draw(CMY);
+    window.draw(RGB);
+    window.draw(Interaction);
+
     while (window.isOpen())
     {
         sf::Event event;
@@ -31,38 +41,44 @@ int main()
             {
                 if (!HoldingMouseButton && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
                 {
-                    
+                    PointerPosition = Interaction.setPosition(event, HoldingMouseButton);
                     HoldingMouseButton = true;
                 }
                 else if (HoldingMouseButton && event.type == sf::Event::MouseButtonReleased)
                 {
                     HoldingMouseButton = false;
-                    
+                    PointerPosition = Interaction.setPosition(event, HoldingMouseButton);
                 }
+                HSL.ChangeShade(event, HoldingMouseButton, PointerPosition);
+                HSV.ChangeShade(event, HoldingMouseButton, PointerPosition);
+                CMY.ChangeShade(event, HoldingMouseButton, PointerPosition);
+                RGB.ChangeShade(event, HoldingMouseButton, PointerPosition);
             }
             else if (HoldingMouseButton && event.mouseMove.x > 610 && event.mouseMove.x < 650 && event.mouseMove.y >= 10 && event.mouseMove.y <= 280)
             {
-                
+                PointerPosition = Interaction.setPosition(event, HoldingMouseButton);
+                HSL.ChangeShade(event, HoldingMouseButton, PointerPosition);
+                HSV.ChangeShade(event, HoldingMouseButton, PointerPosition);
+                CMY.ChangeShade(event, HoldingMouseButton, PointerPosition);
+                RGB.ChangeShade(event, HoldingMouseButton, PointerPosition);
             }
 
         }
-        //tu wyrysowaæ wszystko na ekran
+
         window.draw(HSL);
         window.draw(HSV);
         window.draw(CMY);
         window.draw(RGB);
+        window.draw(Interaction);
 
-
-        ////tu wypisaæ na ekran wartoœæ FPS
-        //if (clock.getElapsedTime().asSeconds() >= 1.0f)
-        //{
-        //    FPS = (unsigned int)((float)frame_counter / clock.getElapsedTime().asSeconds());
-        //    clock.restart();
-        //    frame_counter = 0;
-        //    render.FPScounter[1].setString(std::to_string(FPS) + " FPS");
-        //}
-        //frame_counter++;
-        //window.draw(render.FPScounter[1]);
+        if (clock.getElapsedTime().asSeconds() >= 1.0f)
+        {
+            FPS = (unsigned int)((float)frame_counter / clock.getElapsedTime().asSeconds());
+            clock.restart();
+            frame_counter = 0;
+            Interaction.setFPS(std::to_string(FPS) + " FPS");
+        }
+        frame_counter++;
 
         window.display();
     }

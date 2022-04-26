@@ -1,7 +1,5 @@
 #pragma once
-#include <SFML/Graphics.hpp>
-#include <cstring>
-#include <iostream>
+#include "Circle.h"
 
 class Color
 {
@@ -27,11 +25,17 @@ class HSVColor : public Color
 class CMYColor : public Color
 {
 	sf::Color Convert(double, double, double) override;
-	std::string GetZ() override { return std::string("=" + std::to_string((int)Z) + "%"); }
+	std::string GetZ() override
+	{
+		double temp = round(100 - Z * 100 / 255.);
+		if(temp<10) return std::string("=" + std::to_string(temp).substr(0, 1) + "%");
+		else if(temp>99) return std::string("=" + std::to_string(temp).substr(0, 3) + "%");
+		return std::string("=" + std::to_string(temp).substr(0, 2) + "%");
+	}
 };
 
 class RGBColor : public Color
 {
 	sf::Color Convert(double, double, double) override;
-	std::string GetZ() override { std::cout << Z; return std::string("=" + std::to_string((int)Z)); }
+	std::string GetZ() override { return std::string("=" + std::to_string((int)Z)); }
 };
