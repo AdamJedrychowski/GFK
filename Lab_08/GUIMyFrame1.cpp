@@ -21,11 +21,11 @@ void GUIMyFrame1::wxButton_ReadFile( wxCommandEvent& event )
 	FIMETADATA* mdhandle = NULL;
 	mdhandle = FreeImage_FindFirstMetadata(FIMD_EXIF_MAIN, bitmap, &tag);
 	
-	m_richText1->AppendText("Rozmiar obrazka: " + std::to_string(FreeImage_GetWidth(bitmap))
+	AddText->AppendText("Rozmiar obrazka: " + std::to_string(FreeImage_GetWidth(bitmap))
 		+ "*" + std::to_string(FreeImage_GetHeight(bitmap)) + "\nEXIF Info:\n");
 	if (mdhandle) {
 		do {
-			m_richText1->AppendText(std::string(FreeImage_GetTagKey(tag)) + ": " +
+			AddText->AppendText(std::string(FreeImage_GetTagKey(tag)) + ": " +
 				std::string(FreeImage_TagToString(FIMD_EXIF_MAIN, tag)) + "\n");
 		} while (FreeImage_FindNextMetadata(mdhandle, &tag));
 	}
