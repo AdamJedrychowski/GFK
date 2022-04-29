@@ -36,13 +36,13 @@ class MyFrame1 : public wxFrame
 	private:
 
 	protected:
-		wxButton* m_button1;
-		wxButton* m_button2;
-		wxButton* m_button3;
-		wxCheckBox* m_checkBox1;
-		wxGauge* m_gauge1;
-		wxRichTextCtrl* m_richText1;
-		wxPanel* m_panel2;
+		wxButton* buttonReadFile;
+		wxButton* buttonCenzura;
+		wxButton* buttonErode;
+		wxCheckBox* checkBoxAnimation;
+		wxGauge* ProgressIndicator;
+		wxRichTextCtrl* AddText;
+		wxPanel* panelPhoto;
 
 		// Virtual event handlers, override them in your derived class
 		virtual void wxButton_ReadFile( wxCommandEvent& event ) { event.Skip(); }

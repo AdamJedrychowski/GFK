@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{8749baa6-8ed1-4b1e-aac8-b6d896d39b6d}</ProjectGuid>
+    <ProjectGuid>{1527620a-aee3-49eb-a6ba-7356dceb2a31}</ProjectGuid>
     <RootNamespace>Lab08</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -78,13 +78,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(Path);$(IncludePath)</IncludePath>
-    <LibraryPath>$(Path);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(Path);C:\Users\adamj\Downloads\FreeImage3180\FreeImage\Source;$(IncludePath)</IncludePath>
+    <LibraryPath>$(Path);C:\Users\adamj\Downloads\FreeImage3180\FreeImage\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(Path);$(IncludePath)</IncludePath>
-    <LibraryPath>$(Path);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(Path);C:\Users\adamj\Downloads\FreeImage3180\FreeImage\Source;$(IncludePath)</IncludePath>
+    <LibraryPath>$(Path);C:\Users\adamj\Downloads\FreeImage3180\FreeImage\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -125,6 +125,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -142,16 +143,17 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="GUI.h" />
+    <ClInclude Include="GUIMyFrame1.h" />
+  </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GUI.cpp" />
     <ClCompile Include="GUIMyFrame1.cpp" />
     <ClCompile Include="main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="GUI.h" />
-    <ClInclude Include="GUIMyFrame1.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

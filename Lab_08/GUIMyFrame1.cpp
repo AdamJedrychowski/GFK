@@ -10,6 +10,50 @@ MyFrame1( parent )
 void GUIMyFrame1::wxButton_ReadFile( wxCommandEvent& event )
 {
 // TODO: Implement wxButton_ReadFile
+	wxFileDialog OpenFileDialog(this, _("Choose a file"), _(""), _(""), _("Obraz JPEG (*.jpg)|*.jpg"), wxFD_OPEN);
+	if (OpenFileDialog.ShowModal() == wxID_CANCEL) return;
+
+	FIBITMAP* bitmap = FreeImage_Load(FIF_JPEG, OpenFileDialog.GetPath(), JPEG_DEFAULT);
+	//if (bitmap) {
+	//	// bitmap successfully loaded!
+	//	FITAG* tag = NULL;
+	//	FIMETADATA* mdhandle=NULL;// = FreeImage_FindFirstMetadata(FIMD_EXIF_MAIN, bitmap, &tag);
+	//	std::string delim = ": ";
+	//
+	//	if (mdhandle) {
+
+	//		do {
+	//			// convert the tag value to a string
+	//			const char* value = FreeImage_TagToString(FIMD_EXIF_MAIN, tag);
+	//			// print the tag
+	//			// note that most tags do not have a description,
+	//			// especially when the metadata specifications are not available
+	//			if (FreeImage_GetTagDescription(tag)) {
+	//				std::string s = "";
+	//				s.append(FreeImage_GetTagKey(tag));
+	//				s.append(delim);
+	//				s.append(value);
+	//				s.append(delim);
+	//				s.append(FreeImage_GetTagDescription(tag));
+	//				//metadata.push_back(s);
+	//			}
+	//			else {
+	//				std::string s = "";
+	//				s.append(FreeImage_GetTagKey(tag));
+	//				s.append(delim);
+	//				s.append(value);
+	//				s.append(delim);
+	//				s.append(" ");
+	//				//metadata.push_back(s);
+	//			}
+	//		} while (FreeImage_FindNextMetadata(mdhandle, &tag));
+	//	}
+
+	//	FreeImage_FindCloseMetadata(mdhandle);
+
+
+	//	FreeImage_Unload(bitmap);
+	//}
 }
 
 void GUIMyFrame1::wxButton_Censure( wxCommandEvent& event )
