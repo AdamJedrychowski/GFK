@@ -33,11 +33,9 @@ MyFrame1::MyFrame1( wxWindow* parent, wxWindowID id, const wxString& title, cons
 
 	ProgressIndicator = new wxGauge( this, wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL );
 	ProgressIndicator->SetValue( 0 );
-	ProgressIndicator->Hide();
-
 	bSizer2->Add( ProgressIndicator, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
-	AddText = new wxRichTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 300,-1 ), 0|wxVSCROLL|wxHSCROLL|wxNO_BORDER|wxWANTS_CHARS );
+	AddText = new wxRichTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 280,-1 ), 0|wxVSCROLL|wxHSCROLL|wxNO_BORDER|wxWANTS_CHARS );
 	AddText->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxEmptyString ) );
 
 	bSizer2->Add( AddText, 1, wxALL|wxEXPAND, 5 );
@@ -60,6 +58,7 @@ MyFrame1::MyFrame1( wxWindow* parent, wxWindowID id, const wxString& title, cons
 
 	this->SetSizer( bSizer1 );
 	this->Layout();
+	bSizer1->Fit( this );
 
 	this->Centre( wxBOTH );
 
@@ -68,6 +67,7 @@ MyFrame1::MyFrame1( wxWindow* parent, wxWindowID id, const wxString& title, cons
 	buttonCenzura->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MyFrame1::wxButton_Censure ), NULL, this );
 	buttonErode->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MyFrame1::wxButton_Erode ), NULL, this );
 	checkBoxAnimation->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( MyFrame1::wxCheckBox_StartAnimation ), NULL, this );
+	panelPhoto->Connect( wxEVT_SIZE, wxSizeEventHandler( MyFrame1::ChangePhotoSize ), NULL, this );
 	panelPhoto->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( MyFrame1::wxPanel_Repaint ), NULL, this );
 }
 
@@ -78,6 +78,7 @@ MyFrame1::~MyFrame1()
 	buttonCenzura->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MyFrame1::wxButton_Censure ), NULL, this );
 	buttonErode->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MyFrame1::wxButton_Erode ), NULL, this );
 	checkBoxAnimation->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( MyFrame1::wxCheckBox_StartAnimation ), NULL, this );
+	panelPhoto->Disconnect( wxEVT_SIZE, wxSizeEventHandler( MyFrame1::ChangePhotoSize ), NULL, this );
 	panelPhoto->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( MyFrame1::wxPanel_Repaint ), NULL, this );
 
 }

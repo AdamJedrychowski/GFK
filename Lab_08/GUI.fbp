@@ -47,7 +47,7 @@
             <property name="minimum_size"></property>
             <property name="name">MyFrame1</property>
             <property name="pos"></property>
-            <property name="size">1100,533</property>
+            <property name="size">-1,-1</property>
             <property name="style">wxDEFAULT_FRAME_STYLE</property>
             <property name="subclass">; ; forward_declare</property>
             <property name="title">GFK Lab 08</property>
@@ -470,7 +470,7 @@
                                 <property name="pos"></property>
                                 <property name="resize">Resizable</property>
                                 <property name="show">1</property>
-                                <property name="size">300,-1</property>
+                                <property name="size">280,-1</property>
                                 <property name="style"></property>
                                 <property name="subclass">; ; forward_declare</property>
                                 <property name="toolbar_pane">0</property>
@@ -551,6 +551,7 @@
                                 <property name="window_extra_style"></property>
                                 <property name="window_name"></property>
                                 <property name="window_style">wxTAB_TRAVERSAL</property>
+                                <event name="OnSize">ChangePhotoSize</event>
                                 <event name="OnUpdateUI">wxPanel_Repaint</event>
                             </object>
                         </object>

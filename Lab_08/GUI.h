@@ -49,12 +49,13 @@ class MyFrame1 : public wxFrame
 		virtual void wxButton_Censure( wxCommandEvent& event ) { event.Skip(); }
 		virtual void wxButton_Erode( wxCommandEvent& event ) { event.Skip(); }
 		virtual void wxCheckBox_StartAnimation( wxCommandEvent& event ) { event.Skip(); }
+		virtual void ChangePhotoSize( wxSizeEvent& event ) { event.Skip(); }
 		virtual void wxPanel_Repaint( wxUpdateUIEvent& event ) { event.Skip(); }
 
 
 	public:
 
-		MyFrame1( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("GFK Lab 08"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 1100,533 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		MyFrame1( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("GFK Lab 08"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 
 		~MyFrame1();
 

@@ -78,13 +78,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(Path);C:\Users\adamj\source\FreeImage\Dist\x64;$(IncludePath)</IncludePath>
-    <LibraryPath>$(Path);C:\Users\adamj\source\FreeImage\Dist\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(Path);C:\Users\adamj\source\FreeImage\Dist\x64;F:\Visual Studio\Visual Studio Community\FreeImage\Dist\x64;F:\Visual Studio\Visual Studio Community\CImg;$(IncludePath)</IncludePath>
+    <LibraryPath>$(Path);C:\Users\adamj\source\FreeImage\Dist\x64;F:\Visual Studio\Visual Studio Community\FreeImage\Dist\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(Path);C:\Users\adamj\source\FreeImage\Dist\x64;$(IncludePath)</IncludePath>
-    <LibraryPath>$(Path);C:\Users\adamj\source\FreeImage\Dist\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(Path);C:\Users\adamj\source\FreeImage\Dist\x64;F:\Visual Studio\Visual Studio Community\FreeImage\Dist\x64;F:\Visual Studio\Visual Studio Community\CImg;$(IncludePath)</IncludePath>
+    <LibraryPath>$(Path);C:\Users\adamj\source\FreeImage\Dist\x64;F:\Visual Studio\Visual Studio Community\FreeImage\Dist\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

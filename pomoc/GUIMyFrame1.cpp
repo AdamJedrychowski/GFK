@@ -2,8 +2,10 @@
 
 GUIMyFrame1::GUIMyFrame1( wxWindow* parent )
 :
-MyFrame1( parent )
+	MyFrame1(parent), dc{ m_panel1 }
 {
+	dc.SetPen(wxPen(RGB(0, 0, 0)));
+	time = 0;
 	A = B = D = E = 1;
 	C = F = 0;
 	Draw();
@@ -12,7 +14,7 @@ MyFrame1( parent )
 void GUIMyFrame1::wxPanel_UpdateUI( wxUpdateUIEvent& event )
 {
 // TODO: Implement wxPanel_UpdateUI
-Draw();
+//Draw();
 }
 
 void GUIMyFrame1::wxText_ChangeA( wxCommandEvent& event )
@@ -72,14 +74,18 @@ Draw();
 
 void GUIMyFrame1::Draw()
 {
-	wxClientDC dc(m_panel1);
-	dc.Clear();
-	dc.SetPen(wxPen(RGB(0, 0, 0)));
-	double time = 0;
-	while (time < 2*PI)
+	if (!IsRunning())
 	{
-		dc.DrawLine(200 + 200 * (A * sin(B * time + C)), 200 - 200 * (D * cos(E * time + F)),
-			200 + 200 * (A * sin(B * (time + 0.1) + C)), 200 - 200 * (D * cos(E * (time + 0.1) + F)));
-		time += 0.1;
+		time = 0;
+		dc.Clear();
+		Start(20);
 	}
+}
+
+void GUIMyFrame1::Notify()
+{	
+	dc.DrawLine(200 + 200 * (A * sin(B * time + C)), 200 - 200 * (D * cos(E * time + F)),
+		200 + 200 * (A * sin(B * (time + 0.1) + C)), 200 - 200 * (D * cos(E * (time + 0.1) + F)));
+	time += 0.1;
+	if (time > 2 * PI) Stop();
 }
