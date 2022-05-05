@@ -8,6 +8,7 @@
 !*.fbp
 !Lab*/src
 !Lab*/include
+!Lab*/bin
 !*.bmp
 !*.png
 !*.jpeg
