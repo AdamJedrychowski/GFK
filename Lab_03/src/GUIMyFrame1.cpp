@@ -130,7 +130,7 @@ void GUIMyFrame1::CheckBox_LoadBananOnCheckBox(wxCommandEvent& event)
 	if (CheckBox_LoadBanan->IsChecked())
 	{
 		std::shared_ptr<wxFileDialog> LoadImage(new wxFileDialog(this));
-		LoadImage->SetPath(_("F:\\Visual Studio\\Visual Studio Community\\AdamJedrychowski\\GFK\\Lab_03\\banan.png"));
+		LoadImage->SetPath(_(".\\banan.png"));
 
 		if (!ConnectWithFile.LoadFile(LoadImage->GetPath(), wxBITMAP_TYPE_PNG))
 			wxLogError(_("Nie mo¿na za³adowaæ obrazka"));
